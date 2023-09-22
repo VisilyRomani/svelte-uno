@@ -1,0 +1,425 @@
+[
+	{
+		"suit": "R",
+		"value": "1"
+	},
+	{
+		"suit": "R",
+		"value": "1"
+	},
+	{
+		"suit": "G",
+		"value": "1"
+	},
+	{
+		"suit": "G",
+		"value": "1"
+	},
+	{
+		"suit": "B",
+		"value": "1"
+	},
+	{
+		"suit": "B",
+		"value": "1"
+	},
+	{
+		"suit": "Y",
+		"value": "1"
+	},
+	{
+		"suit": "Y",
+		"value": "1"
+	},
+
+	{
+		"suit": "R",
+		"value": "2"
+	},
+	{
+		"suit": "R",
+		"value": "2"
+	},
+	{
+		"suit": "G",
+		"value": "2"
+	},
+	{
+		"suit": "G",
+		"value": "2"
+	},
+	{
+		"suit": "B",
+		"value": "2"
+	},
+	{
+		"suit": "B",
+		"value": "2"
+	},
+	{
+		"suit": "Y",
+		"value": "2"
+	},
+	{
+		"suit": "Y",
+		"value": "2"
+	},
+
+	{
+		"suit": "R",
+		"value": "3"
+	},
+	{
+		"suit": "R",
+		"value": "3"
+	},
+	{
+		"suit": "G",
+		"value": "3"
+	},
+	{
+		"suit": "G",
+		"value": "3"
+	},
+	{
+		"suit": "B",
+		"value": "3"
+	},
+	{
+		"suit": "B",
+		"value": "3"
+	},
+	{
+		"suit": "Y",
+		"value": "3"
+	},
+	{
+		"suit": "Y",
+		"value": "3"
+	},
+	{
+		"suit": "R",
+		"value": "4"
+	},
+	{
+		"suit": "R",
+		"value": "4"
+	},
+	{
+		"suit": "G",
+		"value": "4"
+	},
+	{
+		"suit": "G",
+		"value": "4"
+	},
+	{
+		"suit": "B",
+		"value": "4"
+	},
+	{
+		"suit": "B",
+		"value": "4"
+	},
+	{
+		"suit": "Y",
+		"value": "4"
+	},
+	{
+		"suit": "Y",
+		"value": "4"
+	},
+	{
+		"suit": "R",
+		"value": "5"
+	},
+	{
+		"suit": "R",
+		"value": "5"
+	},
+	{
+		"suit": "G",
+		"value": "5"
+	},
+	{
+		"suit": "G",
+		"value": "5"
+	},
+	{
+		"suit": "B",
+		"value": "5"
+	},
+	{
+		"suit": "B",
+		"value": "5"
+	},
+	{
+		"suit": "Y",
+		"value": "5"
+	},
+	{
+		"suit": "Y",
+		"value": "5"
+	},
+	{
+		"suit": "R",
+		"value": "6"
+	},
+	{
+		"suit": "R",
+		"value": "6"
+	},
+	{
+		"suit": "G",
+		"value": "6"
+	},
+	{
+		"suit": "G",
+		"value": "6"
+	},
+	{
+		"suit": "B",
+		"value": "6"
+	},
+	{
+		"suit": "B",
+		"value": "6"
+	},
+	{
+		"suit": "Y",
+		"value": "6"
+	},
+	{
+		"suit": "Y",
+		"value": "6"
+	},
+	{
+		"suit": "R",
+		"value": "7"
+	},
+	{
+		"suit": "R",
+		"value": "7"
+	},
+	{
+		"suit": "G",
+		"value": "7"
+	},
+	{
+		"suit": "G",
+		"value": "7"
+	},
+	{
+		"suit": "B",
+		"value": "7"
+	},
+	{
+		"suit": "B",
+		"value": "7"
+	},
+	{
+		"suit": "Y",
+		"value": "7"
+	},
+	{
+		"suit": "Y",
+		"value": "7"
+	},
+	{
+		"suit": "R",
+		"value": "8"
+	},
+	{
+		"suit": "R",
+		"value": "8"
+	},
+	{
+		"suit": "G",
+		"value": "8"
+	},
+	{
+		"suit": "G",
+		"value": "8"
+	},
+	{
+		"suit": "B",
+		"value": "8"
+	},
+	{
+		"suit": "B",
+		"value": "8"
+	},
+	{
+		"suit": "Y",
+		"value": "8"
+	},
+	{
+		"suit": "Y",
+		"value": "8"
+	},
+	{
+		"suit": "R",
+		"value": "9"
+	},
+	{
+		"suit": "R",
+		"value": "9"
+	},
+	{
+		"suit": "G",
+		"value": "9"
+	},
+	{
+		"suit": "G",
+		"value": "9"
+	},
+	{
+		"suit": "B",
+		"value": "9"
+	},
+	{
+		"suit": "B",
+		"value": "9"
+	},
+	{
+		"suit": "Y",
+		"value": "9"
+	},
+	{
+		"suit": "Y",
+		"value": "9"
+	},
+	{
+		"suit": "R",
+		"value": "0"
+	},
+
+	{
+		"suit": "G",
+		"value": "0"
+	},
+
+	{
+		"suit": "B",
+		"value": "0"
+	},
+	{
+		"suit": "Y",
+		"value": "0"
+	},
+	{
+		"suit": "R",
+		"value": "skip"
+	},
+	{
+		"suit": "R",
+		"value": "skip"
+	},
+	{
+		"suit": "G",
+		"value": "skip"
+	},
+	{
+		"suit": "G",
+		"value": "skip"
+	},
+	{
+		"suit": "B",
+		"value": "skip"
+	},
+	{
+		"suit": "B",
+		"value": "skip"
+	},
+	{
+		"suit": "Y",
+		"value": "skip"
+	},
+	{
+		"suit": "Y",
+		"value": "skip"
+	},
+
+	{
+		"suit": "R",
+		"value": "swap"
+	},
+	{
+		"suit": "R",
+		"value": "swap"
+	},
+	{
+		"suit": "G",
+		"value": "swap"
+	},
+	{
+		"suit": "G",
+		"value": "swap"
+	},
+	{
+		"suit": "B",
+		"value": "swap"
+	},
+	{
+		"suit": "B",
+		"value": "swap"
+	},
+	{
+		"suit": "Y",
+		"value": "swap"
+	},
+	{
+		"suit": "Y",
+		"value": "swap"
+	},
+
+	{
+		"suit": "R",
+		"value": "d2"
+	},
+	{
+		"suit": "R",
+		"value": "d2"
+	},
+	{
+		"suit": "G",
+		"value": "d2"
+	},
+	{
+		"suit": "G",
+		"value": "d2"
+	},
+	{
+		"suit": "B",
+		"value": "d2"
+	},
+	{
+		"suit": "B",
+		"value": "d2"
+	},
+	{
+		"suit": "Y",
+		"value": "d2"
+	},
+	{
+		"suit": "Y",
+		"value": "d2"
+	},
+
+	{
+		"suit": "wild",
+		"value": "wild"
+	},
+	{
+		"suit": "wild",
+		"value": "wild"
+	},
+	{
+		"suit": "wild",
+		"value": "wild"
+	},
+	{
+		"suit": "wild",
+		"value": "wild"
+	}
+]
