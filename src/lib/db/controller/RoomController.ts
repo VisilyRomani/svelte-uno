@@ -1,3 +1,4 @@
+import { error } from '@sveltejs/kit';
 import Deck from '../../Cards.json';
 import { Room } from '../model/Room';
 import ShortUniqueId from 'short-unique-id';
@@ -10,6 +11,30 @@ const InitialRoom = async (player: { name: string; id: string }) => {
 		players: [{ name: player.name, id: player.id }]
 	});
 	return room;
+};
+
+const getRoomData = async (room_code: string) => {
+	return JSON.stringify(await Room.findOne({ code: room_code }));
+};
+
+const joinRoom = async ({
+	room_code,
+	name,
+	id
+}: {
+	room_code: string;
+	name: string;
+	id: string;
+}) => {
+	return await Room.findOne({ code: room_code }).then((room) => {
+		if (room && !room.players.find((i) => i.id === id)) {
+			room.players.push({ name: name, id: id, hand: [] });
+			room.save();
+			return { room_code: room.code };
+		} else {
+			throw error(404, { message: 'not found' });
+		}
+	});
 };
 
 const DrawHand = (deck: { suit: string; value: string }[]) => {
@@ -28,4 +53,4 @@ const DrawHand = (deck: { suit: string; value: string }[]) => {
 	return hand;
 };
 
-export { InitialRoom };
+export { InitialRoom, getRoomData, joinRoom };

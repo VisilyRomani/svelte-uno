@@ -3,7 +3,9 @@ import mongoose from '../mongo';
 const Schema = mongoose.Schema;
 const RoomSchema = new Schema({
 	hostid: String,
+	active: String,
 	code: { type: String, require: true, unique: true },
+	started: { type: Boolean, default: false },
 	deck: [
 		{
 			suit: {
@@ -32,6 +34,7 @@ const RoomSchema = new Schema({
 		{
 			name: String,
 			id: String,
+			order: Number,
 			hand: [
 				{
 					suit: {

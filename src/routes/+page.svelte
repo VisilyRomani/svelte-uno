@@ -1,21 +1,15 @@
 <script lang="ts">
-	import { deserialize, enhance } from '$app/forms';
+	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import NameModal from '$lib/components/NameModal.svelte';
 	import { Player } from '$lib/store/Player';
-	import type { EventHandler } from 'svelte/elements';
 
+	let visible = false;
 	let player: { name: string; id: string };
+
 	Player.subscribe((current) => {
 		player = current;
 	});
-
-	const UpdateName = (name: string) => {
-		Player.update((cur) => {
-			return { ...cur, name: name };
-		});
-	};
-	let visible = false;
 </script>
 
 <main class="container">
@@ -32,7 +26,9 @@
 					event.formData.append('id', $Player.id);
 
 					return ({ result }) => {
-						console.log(result);
+						if (result.type === 'success') {
+							goto('/uno/' + result?.data?.room_code);
+						}
 					};
 				}}
 				action="?/connect"
@@ -54,7 +50,9 @@
 						event.formData.append('id', $Player.id);
 
 						return ({ result }) => {
-							console.log(result);
+							if (result.type === 'success') {
+								goto('/uno/' + result?.data?.room_code);
+							}
 						};
 					}}
 				>
