@@ -1,12 +1,20 @@
 <script>
+	import { enhance } from '$app/forms';
+	import { Player } from '$lib/store/Player';
+	import { onMount } from 'svelte';
+	import GameState from '$lib/components/GameState.svelte';
+
 	/** @type {import('./$types').PageData} */
 	export let data;
+
+	onMount(() => {});
+
 	console.log(data);
-	const gameStart = data.data.started;
+	const gameStart = data.data?.started;
 </script>
 
 {#if gameStart}
-	<div>Show game State</div>
+	<GameState />
 {:else}
 	<div class="container">
 		<article>
@@ -21,7 +29,17 @@
 				</div>
 				<h3>code: {data.data.code}</h3>
 			</div>
-			<button>Start</button>
+			{#if data.data.hostid === $Player.id}
+				<form
+					method="post"
+					action="?/start"
+					use:enhance={(event) => {
+						event.formData.append('room_code', data.slug);
+					}}
+				>
+					<button>Start</button>
+				</form>
+			{/if}
 		</article>
 	</div>{/if}
 

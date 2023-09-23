@@ -4,7 +4,7 @@ import { Room } from '../model/Room';
 import ShortUniqueId from 'short-unique-id';
 const uid = new ShortUniqueId();
 
-const InitialRoom = async (player: { name: string; id: string }) => {
+const initialRoom = async (player: { name: string; id: string }) => {
 	const room = await Room.create({
 		hostid: player.id,
 		code: uid.rnd(4),
@@ -14,7 +14,17 @@ const InitialRoom = async (player: { name: string; id: string }) => {
 };
 
 const getRoomData = async (room_code: string) => {
-	return JSON.stringify(await Room.findOne({ code: room_code }));
+	const data = await Room.findOne({ code: room_code });
+	if (data) {
+		return {
+			started: data.started,
+			hostid: data.hostid,
+			players: data.players.map((p) => ({ name: p.name, id: p.id })),
+			code: data.code
+		};
+	} else {
+		throw error(404, { message: "Can't find room data" });
+	}
 };
 
 const joinRoom = async ({
@@ -27,12 +37,33 @@ const joinRoom = async ({
 	id: string;
 }) => {
 	return await Room.findOne({ code: room_code }).then((room) => {
-		if (room && !room.players.find((i) => i.id === id)) {
-			room.players.push({ name: name, id: id, hand: [] });
+		if (room) {
+			if (room.started) {
+				throw error(405, { message: 'game is started' });
+			}
+			if (!room.players.find((i) => i.id === id)) {
+				room.players.push({ name: name, id: id, hand: [] });
+				room.save();
+				return { room_code: room.code };
+			} else {
+				throw error(404, { message: 'not found' });
+			}
+		}
+	});
+};
+
+const startGame = async (room_code: string) => {
+	const DeckInstance = [...Deck];
+	const result = await Room.findOne({ code: room_code }).then((room) => {
+		if (room) {
+			room.players.forEach((player, idx) => {
+				player.hand.push(...DrawHand(DeckInstance));
+				player.order = idx;
+			});
+			room.active = DrawOne(DeckInstance);
+			room.deck.push(...DeckInstance);
+			room.started = true;
 			room.save();
-			return { room_code: room.code };
-		} else {
-			throw error(404, { message: 'not found' });
 		}
 	});
 };
@@ -53,4 +84,16 @@ const DrawHand = (deck: { suit: string; value: string }[]) => {
 	return hand;
 };
 
-export { InitialRoom, getRoomData, joinRoom };
+const DrawOne = (deck: { suit: string; value: string }[]) => {
+	let draw: { suit: string; value: string };
+	const rand = Math.floor(Math.random() * deck.length);
+	if (deck[rand]) {
+		deck.splice(rand, 1);
+		draw = deck[rand];
+		return draw;
+	} else {
+		console.error('one draw error');
+	}
+};
+
+export { initialRoom, getRoomData, joinRoom, startGame };

@@ -1,4 +1,4 @@
-import { InitialRoom, joinRoom } from '$lib/db/controller/RoomController';
+import { initialRoom, joinRoom } from '$lib/db/controller/RoomController';
 
 export const actions = {
 	connect: async ({ request }) => {
@@ -12,7 +12,7 @@ export const actions = {
 			name: string;
 			id: string;
 		};
-		const db_data = await InitialRoom(room);
+		const db_data = await initialRoom(room);
 		return { room_code: db_data.code };
 	}
 };
