@@ -15,7 +15,7 @@
 <main class="container">
 	<article>
 		<hgroup>
-			<h1>Uno</h1>
+			<h1>W-UNO</h1>
 			<h2>Player: {$Player.name}</h2>
 		</hgroup>
 		<div class="grid-main">

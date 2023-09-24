@@ -1,5 +1,6 @@
 import { startGame } from '$lib/db/controller/RoomController.js';
 
+export const ssr = false;
 export const load = async ({ params }) => {
 	return {
 		slug: params.slug
