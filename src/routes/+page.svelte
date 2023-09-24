@@ -21,6 +21,7 @@
 		<div class="grid-main">
 			<form
 				method="post"
+				action="?/connect"
 				use:enhance={(event) => {
 					event.formData.append('name', $Player.name);
 					event.formData.append('id', $Player.id);
@@ -31,14 +32,13 @@
 						}
 					};
 				}}
-				action="?/connect"
 			>
 				<label for="room_code">
 					Join Room
 					<input id="room_code" name="room_code" />
 				</label>
 
-				<button disabled={!$Player.name}>enter</button>
+				<button class="outline" disabled={!$Player.name}>enter</button>
 			</form>
 			<div class="divider" />
 			<div class="right">
@@ -56,14 +56,14 @@
 						};
 					}}
 				>
-					<button disabled={!$Player.name}>Host</button>
+					<button class="outline" disabled={!$Player.name}>Host</button>
 				</form>
 			</div>
 		</div>
+		<div class="setting">
+			<button class="outline contrast" on:click={() => (visible = !visible)}> change name </button>
+		</div>
 	</article>
-	<div class="setting">
-		<button on:click={() => (visible = !visible)}> change name </button>
-	</div>
 	<NameModal {visible} />
 </main>
 
@@ -77,6 +77,7 @@
 	.grid-main {
 		display: grid;
 		grid-template-columns: 1fr auto 1fr;
+		margin-bottom: 30px;
 	}
 	.right {
 		height: 100%;

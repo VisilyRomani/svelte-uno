@@ -54,7 +54,7 @@ const joinRoom = async ({
 
 const startGame = async (room_code: string) => {
 	const DeckInstance = [...Deck];
-	const result = await Room.findOne({ code: room_code }).then((room) => {
+	return await Room.findOne({ code: room_code }).then((room) => {
 		if (room) {
 			room.players.forEach((player, idx) => {
 				player.hand.push(...DrawHand(DeckInstance));
@@ -64,6 +64,27 @@ const startGame = async (room_code: string) => {
 			room.deck.push(...DeckInstance);
 			room.started = true;
 			room.save();
+		}
+	});
+};
+
+const getGameData = async ({ id, room_code }: { id: string; room_code: string }) => {
+	return await Room.findOne({ code: room_code }).then((room) => {
+		if (room) {
+			const Hand = room.players.filter((p) => p.id === id);
+			const others = room.players
+				.filter((p) => !(p.id === id))
+				.map((p) => ({ ...p, hand: p.hand.length }));
+
+			return {
+				hand: Hand.at(0)?.hand,
+				id: Hand.at(0)?.id,
+				name: Hand.at(0)?.name,
+				order: Hand.at(0)?.order,
+				others: others
+			};
+		} else {
+			throw error(404, { message: 'Cant find User Hand' });
 		}
 	});
 };
@@ -96,4 +117,4 @@ const DrawOne = (deck: { suit: string; value: string }[]) => {
 	}
 };
 
-export { initialRoom, getRoomData, joinRoom, startGame };
+export { initialRoom, getRoomData, joinRoom, startGame, getGameData };

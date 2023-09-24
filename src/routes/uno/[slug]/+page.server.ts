@@ -1,11 +1,8 @@
-import { getRoomData, startGame } from '$lib/db/controller/RoomController.js';
+import { startGame } from '$lib/db/controller/RoomController.js';
 
 export const load = async ({ params }) => {
-	const room_data = await getRoomData(params.slug);
-	params.slug;
 	return {
-		slug: params.slug,
-		data: room_data
+		slug: params.slug
 	};
 };
 
@@ -15,14 +12,6 @@ export const actions = {
 		const room = Object.fromEntries(data) as {
 			room_code: string;
 		};
-		console.log;
-		startGame(room.room_code);
+		return startGame(room.room_code);
 	}
-	// gameData: async ({ request }) => {
-	// 	const data = await request.formData();
-	// 	const handDraw = Object.fromEntries(data) as {
-	// 		id: string;
-	// 		room_code: string;
-	// 	};
-	// }
 };

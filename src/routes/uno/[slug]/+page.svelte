@@ -1,40 +1,53 @@
-<script>
+<script lang="ts">
 	import { enhance } from '$app/forms';
 	import { Player } from '$lib/store/Player';
-	import { onMount } from 'svelte';
 	import GameState from '$lib/components/GameState.svelte';
+	import { onMount } from 'svelte';
+	import { roomData } from '$lib/api/roomData';
 
-	/** @type {import('./$types').PageData} */
 	export let data;
 
-	onMount(() => {});
+	let room: roomData;
+	let gameStart = false;
 
-	console.log(data);
-	const gameStart = data.data?.started;
+	onMount(async () => {
+		room = await roomData({ room_code: data.slug });
+		gameStart = room.started;
+	});
+
+	const refetchRoom = async () => {
+		room = await roomData({ room_code: data.slug });
+		gameStart = room.started;
+	};
 </script>
 
 {#if gameStart}
-	<GameState />
-{:else}
+	<GameState code={data.slug} />
+{:else if room}
 	<div class="container">
 		<article>
 			<div class="grid-main">
 				<div>
 					<h3>Players</h3>
-					{#each data.data.players as player}
+					{#each room.players as player}
 						<div>
 							<p>{player.name}</p>
 						</div>
 					{/each}
 				</div>
-				<h3>code: {data.data.code}</h3>
+				<h3>code: {room.code}</h3>
 			</div>
-			{#if data.data.hostid === $Player.id}
+			{#if room.hostid === $Player.id}
 				<form
 					method="post"
 					action="?/start"
-					use:enhance={(event) => {
+					use:enhance={async (event) => {
 						event.formData.append('room_code', data.slug);
+						return async ({ result }) => {
+							if (result.type === 'success') {
+								await refetchRoom();
+							}
+						};
 					}}
 				>
 					<button>Start</button>
