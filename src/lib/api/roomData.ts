@@ -17,6 +17,6 @@ export const roomData = async ({ room_code }: { room_code: string }) => {
 	if (!response.ok) {
 		throw new Error('Network response was not ok');
 	}
-	const data = await response.json();
+	const data = (await response.json()) as roomData;
 	return data;
 };

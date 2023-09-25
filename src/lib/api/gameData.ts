@@ -8,7 +8,7 @@ export type gameData = {
 	name: string;
 	order: number;
 	others: {
-		_id: string;
+		id: string;
 		name: string;
 		amount: number;
 	}[];
@@ -24,6 +24,6 @@ export const gameData = async ({ id, room_code }: { id: string; room_code: strin
 	if (!response.ok) {
 		throw new Error('Network response was not ok');
 	}
-	const data = await response.json();
-	return data as gameData;
+	const data = (await response.json()) as gameData;
+	return data;
 };
