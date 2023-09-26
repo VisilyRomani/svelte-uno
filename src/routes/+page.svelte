@@ -11,17 +11,8 @@
 	Player.subscribe((current) => {
 		player = current;
 	});
-
-	const sendMessage = () => {
-		io.emit('message', 'ducks');
-	};
-
-	io.on('message', () => {
-		console.log('');
-	});
 </script>
 
-<button on:click={() => sendMessage()}>sendMessage</button>
 <main class="container">
 	<article>
 		<hgroup>

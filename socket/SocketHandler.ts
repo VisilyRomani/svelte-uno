@@ -5,16 +5,19 @@ import type http from 'http';
 export default function injectSocketIO(server: http.Server) {
 	const io = new Server(server);
 
-	io.on('connection', (socket) => {
+	io.sockets.on('connection', (socket) => {
 		const username = `User ${Math.round(Math.random() * 999999)}`;
 		socket.emit('name', username);
 
-		socket.on('message', (message) => {
-			io.emit('message', {
-				from: username,
-				message: message,
-				time: new Date().toLocaleString()
-			});
+		socket.on('subscribe', function (room: string) {
+			socket.join(room);
+			io.in(room).emit('reload', `is reloading for: ${room}`);
+		});
+
+		socket.on('unsubscribe', function (room: string) {
+			console.log('disconnected');
+			socket.leave(room);
+			io.in(room).emit('reload', `is reloading for: ${room}`);
 		});
 	});
 

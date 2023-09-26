@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { Player } from '$lib/store/Player';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { roomData, type RoomData } from '$lib/api/roomData';
 	import GameState from '$lib/components/GameState.svelte';
 	import avatar from 'animal-avatar-generator';
 	import ShortUniqueId from 'short-unique-id';
+	import { io } from '$lib/socket/socket-client.js';
 	const uid = new ShortUniqueId();
 
 	export let data;
@@ -17,16 +18,27 @@
 	const refetchRoom = async () => {
 		room = await roomData({ room_code: data.slug });
 	};
+
 	onMount(async () => {
+		refetchRoom();
+	});
+
+	io.emit('subscribe', data.slug);
+
+	const beforeUnload = async () => {
+		io.emit('unsubscribe', data.slug);
+	};
+
+	io.on('reload', (msg: string) => {
+		console.log('socket-refetch');
 		refetchRoom();
 	});
 
 	$: is_host = !!room?.players.find((p) => p.player_id === $Player.player_id && p.is_host);
 	$: isStarted = !!room?.started;
-	$: console.log(isStarted);
-	$: console.log(room);
 </script>
 
+<svelte:window on:beforeunload={beforeUnload} />
 {#if isStarted}
 	<GameState code={data.slug} />
 {:else if room}
