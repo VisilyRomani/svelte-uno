@@ -1,36 +1,39 @@
 <script lang="ts">
 	import { Player } from '$lib/store/Player';
 	import Card from './Card.svelte';
-	import { gameData } from '$lib/api/gameData';
+	import { gameData, type GameData } from '$lib/api/gameData';
 	import { onMount } from 'svelte';
 	import Opponent from './Opponent.svelte';
 
 	export let code: string;
-	let data = {} as gameData;
+	let data = {} as GameData | undefined;
+	let hand: { card_id: string; value: string; suit: string }[] = [];
 	let toggle = false;
 	onMount(async () => {
 		try {
-			data = await gameData({ room_code: code, id: $Player.id });
-		} catch (error) {
-			// Handle the error, e.g., show an error message to the user
-		}
+			data = await gameData({ room_code: code, player_id: $Player.player_id });
+			hand = data?.player.hand ?? [];
+		} catch (error) {}
 	});
-	$: console.log(data);
 </script>
 
-<div class="container">
-	<div class="opponent-container">
-		{#each data.others ?? [] as other}
-			<Opponent player={other} active={toggle} />
-		{/each}
-	</div>
+{#if !data}
+	<div aria-busy="true" />
+{:else}
+	<div class="container">
+		<div class="opponent-container">
+			{#each data.others ?? [] as other}
+				<Opponent player={other} active={toggle} />
+			{/each}
+		</div>
 
-	<div class="hand-container">
-		{#each data?.hand ?? [] as card}
-			<Card {card} />
-		{/each}
+		<div class="hand-container">
+			{#each hand ?? [] as card}
+				<Card {card} />
+			{/each}
+		</div>
 	</div>
-</div>
+{/if}
 
 <style>
 	.container {

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import avatar from 'animal-avatar-generator';
-	export let player: { name: string; id: string; amount: number };
+	export let player: { name: string | undefined; player_id: string; amount: number };
 	export let active = false;
 </script>
 
 <div>
 	<h3 class={(active ? 'active' : '') + ' player'}>
-		{@html avatar(player.id ?? '', { size: 50 })}
+		{@html avatar(player.player_id ?? '', { size: 50 })}
 		<span class="amount">
 			{player.amount}
 		</span>

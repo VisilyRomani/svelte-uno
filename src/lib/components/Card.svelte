@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let card: { value: string; suit: string; _id: string };
+	export let card: { value: string; suit: string; card_id: string };
 	const Color = () => {
 		if (card.suit === 'R') {
 			return 'background-color: rgb(255, 114, 114)';

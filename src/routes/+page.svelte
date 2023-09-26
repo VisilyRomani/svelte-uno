@@ -5,7 +5,7 @@
 	import { Player } from '$lib/store/Player';
 
 	let visible = false;
-	let player: { name: string; id: string };
+	let player: { name: string; player_id: string };
 
 	Player.subscribe((current) => {
 		player = current;
@@ -24,11 +24,11 @@
 				action="?/connect"
 				use:enhance={(event) => {
 					event.formData.append('name', $Player.name);
-					event.formData.append('id', $Player.id);
+					event.formData.append('player_id', $Player.player_id);
 
 					return ({ result }) => {
 						if (result.type === 'success') {
-							goto('/uno/' + result?.data?.room_code);
+							goto('/uno/' + result.data?.room_code);
 						}
 					};
 				}}
@@ -47,7 +47,7 @@
 					action="?/host"
 					use:enhance={(event) => {
 						event.formData.append('name', $Player.name);
-						event.formData.append('id', $Player.id);
+						event.formData.append('player_id', $Player.player_id);
 
 						return ({ result }) => {
 							if (result.type === 'success') {

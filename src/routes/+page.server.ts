@@ -3,16 +3,16 @@ import { RoomController } from '$lib/db/controller/RoomController';
 export const actions = {
 	connect: async ({ request }) => {
 		const data = await request.formData();
-		const room = Object.fromEntries(data) as { name: string; id: string; room_code: string };
-		return await RoomController.joinRoom(room);
+		const name = String(data.get('name'));
+		const player_id = String(data.get('player_id'));
+		const room_code = String(data.get('room_code'));
+		return await RoomController.joinRoom({ name, player_id, room_code });
 	},
 	host: async ({ request }) => {
 		const data = await request.formData();
-		const room = Object.fromEntries(data) as {
-			name: string;
-			id: string;
-		};
-		const db_data = await RoomController.initialRoom(room);
-		return { room_code: db_data.room_code };
+		const name = String(data.get('name'));
+		const player_id = String(data.get('player_id'));
+		const room_code = await RoomController.initialRoom({ name, player_id });
+		return { room_code: room_code };
 	}
 };

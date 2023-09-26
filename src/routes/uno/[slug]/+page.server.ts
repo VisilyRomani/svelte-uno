@@ -1,4 +1,4 @@
-import { GameController } from '$lib/db/controller/GameController.js';
+import { GameController } from '$lib/db/controller/GameController';
 
 export const ssr = false;
 export const load = async ({ params }) => {
@@ -10,9 +10,7 @@ export const load = async ({ params }) => {
 export const actions = {
 	start: async ({ request }) => {
 		const data = await request.formData();
-		const room = Object.fromEntries(data) as {
-			room_code: string;
-		};
-		return GameController.startGame(room.room_code);
+		const room_code = String(data.get('room_code'));
+		return JSON.stringify(await GameController.startGame(room_code));
 	}
 };

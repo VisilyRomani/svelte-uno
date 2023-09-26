@@ -4,7 +4,7 @@ import { browser } from '$app/environment';
 const uid = new ShortUniqueId();
 
 const GetPlayer = () => {
-	const newPlayer = { name: '', id: uid.rnd() };
+	const newPlayer = { name: '', player_id: uid.rnd() };
 	if (browser) {
 		const playerData = localStorage.getItem('player');
 		if (playerData) {
@@ -18,4 +18,4 @@ const GetPlayer = () => {
 	}
 };
 
-export const Player = writable(GetPlayer());
+export const Player = writable<{ player_id: string; name: string }>(GetPlayer());

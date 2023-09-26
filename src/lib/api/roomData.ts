@@ -1,22 +1,24 @@
-export type roomData = {
-	started: boolean;
-	hostid: string | undefined;
+import axios from 'axios';
+
+export type RoomData = {
+	started: boolean | undefined;
 	players: {
 		name: string | undefined;
-		id: string | undefined;
+		player_id: string | undefined;
+		is_host: boolean;
 	}[];
-	code: string | undefined;
+	room_code: string | undefined;
 };
 
 export const roomData = async ({ room_code }: { room_code: string }) => {
-	const response = await fetch(`/api/room-data`, {
-		method: 'POST',
-		headers: { 'content-type': 'application/json' },
-		body: JSON.stringify({ room_code })
-	});
-	if (!response.ok) {
-		throw new Error('Network response was not ok');
+	try {
+		const response = await axios.get<RoomData>('/api/room-data', {
+			params: {
+				room_code
+			}
+		});
+		return response.data;
+	} catch (err) {
+		console.error(err);
 	}
-	const data = (await response.json()) as roomData;
-	return data;
 };
