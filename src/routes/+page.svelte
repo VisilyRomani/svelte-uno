@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import NameModal from '$lib/components/NameModal.svelte';
 	import { Player } from '$lib/store/Player';
+	import { io } from '$lib/socket/socket-client';
 
 	let visible = false;
 	let player: { name: string; player_id: string };
@@ -10,8 +11,17 @@
 	Player.subscribe((current) => {
 		player = current;
 	});
+
+	const sendMessage = () => {
+		io.emit('message', 'ducks');
+	};
+
+	io.on('message', () => {
+		console.log('');
+	});
 </script>
 
+<button on:click={() => sendMessage()}>sendMessage</button>
 <main class="container">
 	<article>
 		<hgroup>
