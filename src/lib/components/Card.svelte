@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { page } from '$app/stores';
+	import { Game } from '$lib/api/GameApi';
+
 	export let card: { value: string; suit: string; card_id: string };
 	const Color = () => {
 		if (card.suit === 'R') {
@@ -11,9 +14,14 @@
 			return 'background-color: rgb(243, 255, 114)';
 		}
 	};
+	// console.log($page.data.slug);
+
+	const PlayCard = async () => {
+		await Game.PlayCard({ room_code: $page.data.slug, card });
+	};
 </script>
 
-<button on:click={() => console.log(card)} class="card" style={Color()}>
+<button on:click={() => PlayCard()} class="card" style={Color()}>
 	<h1>{card.value}</h1>
 </button>
 

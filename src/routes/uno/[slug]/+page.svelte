@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { Player } from '$lib/store/Player';
-	import { onDestroy, onMount } from 'svelte';
-	import { roomData, type RoomData } from '$lib/api/roomData';
+	import { onMount } from 'svelte';
+	import { Room, type RoomData } from '$lib/api/RoomApi.js';
 	import GameState from '$lib/components/GameState.svelte';
 	import avatar from 'animal-avatar-generator';
 	import ShortUniqueId from 'short-unique-id';
@@ -16,7 +16,7 @@
 	let is_host: boolean;
 
 	const refetchRoom = async () => {
-		room = await roomData({ room_code: data.slug });
+		room = await Room.RoomData({ room_code: data.slug });
 	};
 
 	onMount(async () => {
@@ -30,7 +30,7 @@
 	};
 
 	io.on('reload', (msg: string) => {
-		console.log('socket-refetch');
+		console.log(msg);
 		refetchRoom();
 	});
 
@@ -66,6 +66,7 @@
 						return async ({ result }) => {
 							if (result.type === 'success') {
 								await refetchRoom();
+								io.emit('update', data.slug);
 								loading = false;
 							}
 						};

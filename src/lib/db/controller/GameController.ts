@@ -2,6 +2,7 @@ import { Room } from '../model/Room';
 import Deck from '../../Cards.json';
 import { error } from '@sveltejs/kit';
 import ShortUniqueId from 'short-unique-id';
+import type { drawType } from '../../../routes/api/play-card/+server';
 const uid = new ShortUniqueId();
 
 export const GameController = {
@@ -15,9 +16,9 @@ export const GameController = {
 			const current = room.players.indexOf(player);
 			player.hand.push(...DrawHand(DeckInstance));
 			if (current !== room.players.length + 1) {
-				player.next_player = room.players[0].id;
+				player.next_player = room.players[0].player_id;
 			} else {
-				player.next_player = room.players[current + 1].id;
+				player.next_player = room.players[current + 1].player_id;
 			}
 
 			if (player.is_host) {
@@ -28,7 +29,6 @@ export const GameController = {
 		room.game.deck.push(...DeckInstance);
 		room.game.started = true;
 		await room.save();
-		console.log(room);
 		return room;
 	},
 	getGameData: async ({ player_id, room_code }: { player_id: string; room_code: string }) => {
@@ -41,13 +41,45 @@ export const GameController = {
 
 		const others = room.players
 			.filter((p) => !(p.player_id === player_id))
-			.map((o) => ({ amount: o.hand.length, id: String(o.id), name: o.name }));
+			.map((o) => ({ amount: o.hand.length, player_id: String(o.player_id), name: o.name }));
+
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 		return {
 			player,
+			current_player: {
+				player_id: room.game.current_player?.player_id,
+				next_player: room.game.current_player?.next_player
+			},
 			active: room.game.active,
 			others: others
 		};
+	},
+	playCard: async ({ room_code, card }: drawType) => {
+		const room = await Room.findOne({ room_code: room_code });
+
+		if (!room) {
+			throw error(404, { message: 'Cant find room when playing card' });
+		}
+
+		if (
+			room.game.active?.suit === card.suit ||
+			room.game.active?.value === card.value ||
+			card.value === 'wild'
+		) {
+			switch (card.value) {
+				case '⧉':
+					break;
+				case '⇅':
+					break;
+				case '⍉':
+					break;
+				case 'wild':
+					break;
+				default:
+					break;
+			}
+		}
 	}
 };
 

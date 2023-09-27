@@ -6,19 +6,25 @@ export default function injectSocketIO(server: http.Server) {
 	const io = new Server(server);
 
 	io.sockets.on('connection', (socket) => {
-		const username = `User ${Math.round(Math.random() * 999999)}`;
-		socket.emit('name', username);
-
 		socket.on('subscribe', function (room: string) {
 			socket.join(room);
-			io.in(room).emit('reload', `is reloading for: ${room}`);
+			io.in(room).emit('reload', `is reloading for: ${room}, subscribe`);
 		});
 
 		socket.on('unsubscribe', function (room: string) {
 			console.log('disconnected');
 			socket.leave(room);
-			io.in(room).emit('reload', `is reloading for: ${room}`);
+			io.in(room).emit('reload', `is reloading for: ${room}, unsubscribe`);
 		});
+
+		socket.on('update', (room: string) => {
+			io.in(room).emit('reload', `is reloading for: ${room}, update`);
+			console.log('start reload', room);
+		});
+
+		// io.on('reload', () => {
+		// 	console.log('start reload');
+		// });
 	});
 
 	console.log('SocketIO injected');
