@@ -1,5 +1,5 @@
 import { Player } from './player';
-import Cards from '../Cards.json';
+import Cards from './Cards.json';
 import ShortUniqueId from 'short-unique-id';
 import { error } from '@sveltejs/kit';
 const uid = new ShortUniqueId();
@@ -27,9 +27,8 @@ export class Game {
 	startGame() {
 		this.started = true;
 		this.players.map((p, idx) => {
-			console.log(idx + 1, ' | ', this.players.length - 1);
 			if (idx + 1 > this.players.length - 1) {
-				p.next_player = this.players[0];
+				p.next_player = undefined;
 			} else {
 				p.next_player = this.players[(idx += 1)];
 			}
@@ -76,8 +75,19 @@ export class Game {
 			return {
 				started: this.started,
 				in_play: this.in_play,
+				current_player: this.current_player,
 				hand: this.players.find((p) => p.player_id === player_id)?.hand,
-				players: this.players
+				players: [
+					...this.players
+						.filter((p) => {
+							return p.player_id !== player_id;
+						})
+						.map((p) => ({
+							player_id: p.player_id,
+							name: p.name,
+							card_count: p.hand.length
+						}))
+				]
 			};
 		}
 	}

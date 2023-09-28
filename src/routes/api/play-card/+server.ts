@@ -1,5 +1,3 @@
-import { GameController } from '$lib/db/controller/GameController.js';
-
 export type drawType = {
 	room_code: string;
 	card: {

@@ -14,10 +14,9 @@
 			return 'background-color: rgb(243, 255, 114)';
 		}
 	};
-	// console.log($page.data.slug);
 
 	const PlayCard = async () => {
-		await Game.PlayCard({ room_code: $page.data.slug, card });
+		// await Game.PlayCard({ room_code: $page.data.slug, card });
 	};
 </script>
 

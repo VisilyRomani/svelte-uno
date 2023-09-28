@@ -1,8 +1,14 @@
-import { GameController } from '$lib/db/controller/GameController.js';
+import { GetRoom } from '$lib/GameData/GameController.js';
+
 export async function GET({ url }) {
 	const room_code = String(url.searchParams.get('room_code'));
 	const player_id = String(url.searchParams.get('player_id'));
 
-	const gameData = await GameController.getGameData({ player_id: player_id, room_code: room_code });
-	return new Response(JSON.stringify(gameData));
+	const room = GetRoom(room_code);
+
+	if (room) {
+		return new Response(JSON.stringify(room.gameState(player_id)));
+	} else {
+		return new Response('missing room');
+	}
 }

@@ -1,14 +1,14 @@
 <script lang="ts">
 	import avatar from 'animal-avatar-generator';
-	export let player: { name: string | undefined; player_id: string; amount: number };
+	export let player: { name: string | undefined; player_id: string; card_count: number };
 	export let active = false;
 </script>
 
 <div>
 	<h3 class={(active ? 'active' : '') + ' player'}>
 		{@html avatar(player.player_id ?? '', { size: 50 })}
-		<span class="amount">
-			{player.amount}
+		<span class="card_count">
+			{player.card_count}
 		</span>
 		{player.name}
 	</h3>
@@ -19,7 +19,7 @@
 		display: inline-block;
 		transition: 0.1s ease;
 	}
-	.amount {
+	.card_count {
 		border: 1px solid whitesmoke;
 		padding: 3px;
 	}

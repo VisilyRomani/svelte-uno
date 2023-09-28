@@ -10,6 +10,9 @@ export const CreateRoom = (player: { player_id: string; name: string }) => {
 	const host = new Player(player, true);
 	const game = new Game(host);
 	SWUNO_ROOM.set(room_code, game);
+	return room_code;
 };
 
-// SWUNO_ROOM.get(room_code)
+export const GetRoom = (room_code: string) => {
+	return SWUNO_ROOM.get(room_code);
+};
