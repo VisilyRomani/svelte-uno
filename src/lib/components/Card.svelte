@@ -2,6 +2,7 @@
 	import { page } from '$app/stores';
 	import { Game } from '$lib/api/GameApi';
 
+	export let deck: false;
 	export let card: { value: string; suit: string; card_id: string };
 	const Color = () => {
 		if (card.suit === 'R') {

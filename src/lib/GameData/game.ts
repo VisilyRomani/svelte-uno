@@ -39,6 +39,7 @@ export class Game {
 		const card = this.drawRandomCard(1);
 		if (card.length) {
 			this.in_play = card.at(0);
+			console.log(this.in_play);
 		} else {
 			throw error(404, { message: 'Set inital in play error' });
 		}
