@@ -2,21 +2,21 @@
 	import { enhance } from '$app/forms';
 	import { Player } from '$lib/store/Player';
 	import { onMount } from 'svelte';
-	import { Room, type RoomData } from '$lib/api/RoomApi.js';
 	import GameState from '$lib/components/GameState.svelte';
 	import avatar from 'animal-avatar-generator';
 	import ShortUniqueId from 'short-unique-id';
 	import { io } from '$lib/socket/socket-client.js';
+	import { Game, type GameNotStarted, type GameStarted } from '$lib/api/GameApi.js';
 	const uid = new ShortUniqueId();
 
 	export let data;
 	let loading = false;
 	let isStarted = false;
-	let room: RoomData | undefined;
+	let room: GameNotStarted | GameStarted | undefined;
 	let is_host: boolean;
 
 	const refetchRoom = async () => {
-		room = await Room.RoomData({ room_code: data.slug });
+		room = await Game.GameData({ player_id: $Player.player_id, room_code: data.slug });
 	};
 
 	onMount(async () => {
@@ -34,12 +34,11 @@
 		refetchRoom();
 	});
 
-	$: is_host = !!room?.players.find((p) => p.player_id === $Player.player_id && p.is_host);
-	$: isStarted = !!room?.started;
+	$: is_host = !!room?.players.find((p) => p.player_id === $Player.player_id && p.is_host) || false;
 </script>
 
 <svelte:window on:beforeunload={beforeUnload} />
-{#if isStarted}
+{#if room?.started}
 	<GameState code={data.slug} />
 {:else if room}
 	<div class="container">
@@ -47,14 +46,14 @@
 			<div class="grid-main">
 				<div>
 					<h3>Players</h3>
-					{#each room.players as player}
+					{#each room.players || [] as player}
 						<div class="player">
 							{@html avatar(player.player_id ?? uid.rnd(4), { size: 50 })}
 							<p>{player.name}</p>
 						</div>
 					{/each}
 				</div>
-				<h3>code: {room.room_code}</h3>
+				<h3>code: {data.slug}</h3>
 			</div>
 			{#if is_host}
 				<form

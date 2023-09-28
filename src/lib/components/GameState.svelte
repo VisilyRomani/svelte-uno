@@ -1,21 +1,22 @@
 <script lang="ts">
 	import { Player } from '$lib/store/Player';
 	import Card from './Card.svelte';
-	import { Game, type GameData } from '$lib/api/GameApi';
+	import { Game, type GameData, type GameStarted } from '$lib/api/GameApi';
 	import { onMount } from 'svelte';
 	import Opponent from './Opponent.svelte';
 
 	export let code: string;
-	let data = {} as GameData | undefined;
+	let data = {} as GameStarted | undefined;
 	let hand: { card_id: string; value: string; suit: string }[] = [];
 	onMount(async () => {
 		try {
-			data = await Game.GameData({ room_code: code, player_id: $Player.player_id });
-			hand = data?.player.hand ?? [];
+			const res = await Game.GameData({ room_code: code, player_id: $Player.player_id });
+			if (res?.started) {
+				data = res;
+			}
+			hand = data?.hand ?? [];
 		} catch (error) {}
 	});
-
-	$: console.log(data?.current_player?.player_id, data?.others);
 </script>
 
 {#if !data}
@@ -23,8 +24,8 @@
 {:else}
 	<div class="container">
 		<div class="opponent-container">
-			{#each data.others ?? [] as other}
-				<Opponent player={other} active={other.player_id === data.current_player.player_id} />
+			{#each data.players ?? [] as player}
+				<Opponent {player} active={player.player_id === data.current_player.player_id} />
 			{/each}
 		</div>
 

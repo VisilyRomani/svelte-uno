@@ -1,72 +1,77 @@
+import type { Card } from '$lib/GameData/game';
+import type { Player } from '$lib/GameData/player';
 import axios from 'axios';
 
-export type GameData = {
-	player: {
+export interface GameStarted {
+	started: true;
+	in_play: Card;
+	current_player: Player;
+	hand: Card[];
+	players: {
 		player_id: string;
 		name: string;
-		is_host: true;
-		hand: [{ card_id: string; value: string; suit: string }];
-		next_player: string;
-	};
-	current_player: {
+		is_host: boolean;
+		card_count: number;
+	}[];
+}
+export interface GameNotStarted {
+	started: false;
+	players: {
 		player_id: string;
-		next_player: string;
-	};
-	active: {
-		card_id: string;
-		value: string;
-		suit: string;
-	};
-	others: [{ amount: number; player_id: string; name: string | undefined }];
-};
+		is_host: boolean;
+		name: string;
+	}[];
+}
+
+export type GameData = GameNotStarted | GameStarted;
 
 export const Game = {
 	GameData: async ({ player_id, room_code }: { player_id: string; room_code: string }) => {
 		try {
-			const response = await axios.get<GameData>('/api/game-data', {
+			const { data } = await axios.get<GameNotStarted | GameStarted>('/api/game-data', {
 				params: {
 					player_id,
 					room_code
 				}
 			});
 
-			return response.data;
-		} catch (err) {
-			console.log(err);
-		}
-	},
-	DrawCard: async (room_code: string) => {
-		try {
-			const response = await axios.get('/api/draw-card', {
-				data: {
-					room_code
-				}
-			});
-			return response;
-		} catch (err) {
-			console.log(err);
-		}
-	},
-	PlayCard: async ({
-		room_code,
-		card
-	}: {
-		room_code: string;
-		card: { card_id: string; value: string; suit: string };
-	}) => {
-		console.log(room_code, card);
-		try {
-			const response = await axios.post('/api/play-card', {
-				body: JSON.stringify({
-					room_code,
-					card
-				})
-			});
-			return response;
+			return data;
 		} catch (err) {
 			console.log(err);
 		}
 	}
+	// DrawCard: async (room_code: string) => {
+	// 	try {
+	// 		const response = await axios.get('/api/draw-card', {
+	// 			data: {
+	// 				room_code
+	// 			}
+	// 		});
+	// 		return response;
+	// 	} catch (err) {
+	// 		console.log(err);
+	// 	}
+	// },
+	// PlayCard: async ({
+	// 	room_code,
+	// 	card
+	// }: {
+	// 	room_code: string;
+	// 	card: { card_id: string; value: string; suit: string };
+	// }) => {
+	// 	console.log(room_code, card);
+	// 	try {
+	// 		const response = await axios.post('/api/play-card', {
+	// 			body: JSON.stringify({
+	// 				room_code,
+	// 				card
+	// 			})
+	// 		});
+	// 		return response;
+	// 	} catch (err) {
+	// 		console.log(err);
+	// 	}
+	// }
 };
 // ⧉
 // 		"value": "⇅"
