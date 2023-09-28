@@ -11,7 +11,6 @@ export type drawType = {
 export async function POST({ request }) {
 	const data = await request.json();
 	const { card, room_code }: drawType = JSON.parse(data.body);
-    GameController.
 
 	return new Response();
 }
