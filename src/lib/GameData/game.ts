@@ -27,6 +27,7 @@ export class Game {
 
 	startGame() {
 		this.started = true;
+		this.time_last_moved = new Date();
 		this.players.map((p, idx) => {
 			if (idx + 1 > this.players.length - 1) {
 				p.next_player = undefined;
@@ -77,6 +78,7 @@ export class Game {
 			return {
 				started: this.started,
 				in_play: this.in_play,
+				time_last_moved: this.time_last_moved,
 				current_player: this.current_player,
 				hand: this.players.find((p) => p.player_id === player_id)?.hand,
 				players: [

@@ -6,7 +6,8 @@
 	import Opponent from './Opponent.svelte';
 	import { io } from '$lib/socket/socket-client';
 
-	let timer = 10;
+	const player_timer = 30;
+	let time_last = 0;
 	export let code: string;
 	let data: GameStarted | undefined;
 	let hand: { card_id: string; value: string; suit: string }[] = [];
@@ -22,18 +23,35 @@
 		}
 	});
 
-	io.on('timer', (msg: number) => {
-		timer = msg;
+	$: io.on('player_countdown', (msg: number) => {
+		time_last = msg;
 	});
 
-	$: console.log(data);
+	const Timer = () => {
+		if (data?.time_last_moved) {
+			time_last = (new Date().getTime() - new Date(data?.time_last_moved).getTime()) / 1000;
+		}
+		if (data?.current_player.player_id === $Player.player_id) {
+			if (player_timer - time_last < 0) {
+				// auto next turn
+			} else {
+				io.emit('timer', { room_code: code, timer: time_last });
+				setTimeout(Timer, 1000);
+			}
+		}
+	};
+	setTimeout(Timer, 1000);
+	$: console.log(player_timer - time_last);
 </script>
 
 {#if !data}
 	<div aria-busy="true" />
 {:else}
 	<div class="container">
-		<p class="timer">{timer}</p>
+		<!-- <p class="timer">{timer}</p> -->
+		<!-- {#if data.current_player.player_id !== $Player.player_id} -->
+		<progress class="timer" value={player_timer - time_last} max="30" />
+		<!-- {/if} -->
 		<div class="opponent-container">
 			{#each data.players ?? [] as player}
 				<Opponent {player} active={player.player_id === data.current_player.player_id} />
@@ -54,16 +72,8 @@
 {/if}
 
 <style>
-	.timer {
-		position: absolute;
-		right: 10px;
-		top: 10px;
-		width: 100px;
-		height: 100px;
-		text-align: center;
-		font-size: 3em;
-		border: 1px solid;
-		border-radius: 50%;
+	progress {
+		transition: width 5s ease;
 	}
 	.center-container {
 		display: flex;

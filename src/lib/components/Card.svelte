@@ -11,6 +11,8 @@
 			return 'background-color: rgb(114, 255, 156)';
 		} else if (card.suit === 'B') {
 			return 'background-color: rgb(114, 137, 255)';
+		} else if (card.value === 'wild') {
+			return 'background-color: black';
 		} else {
 			return 'background-color: rgb(243, 255, 114)';
 		}

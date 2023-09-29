@@ -6,6 +6,7 @@ export interface GameStarted {
 	started: true;
 	in_play: Card;
 	current_player: Player;
+	time_last_moved: Date;
 	hand: Card[];
 	players: {
 		player_id: string;

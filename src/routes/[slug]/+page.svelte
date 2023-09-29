@@ -25,6 +25,7 @@
 	io.emit('subscribe', data.slug);
 
 	const beforeUnload = async () => {
+		console.log('unloaded');
 		io.emit('unsubscribe', data.slug);
 	};
 

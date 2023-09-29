@@ -1,7 +1,6 @@
 // socketIoHandler.js
 import { Server } from 'socket.io';
 import type http from 'http';
-import { GetRoom } from '$lib/GameData/GameController';
 
 export default function injectSocketIO(server: http.Server) {
 	const io = new Server(server);
@@ -24,18 +23,23 @@ export default function injectSocketIO(server: http.Server) {
 			io.in(room).emit('reload', `is reloading for: ${room}, update`);
 			console.log('start reload', room);
 		});
+
+		socket.on('timer', ({ room_code, timer }: { room_code: string; timer: number }) => {
+			io.in(room_code).emit('player_countdown', timer);
+		});
 	});
 
-	const Timer = () => {
-		const date = new Date();
-		for (const room in socket_room) {
-			const game = GetRoom(room);
-			if (game?.started) {
-				const diff = date.getTime() - game.time_last_moved.getTime();
-				io.in(room).emit('timer', diff);
-			}
-		}
-	};
-	setInterval(Timer, 1000);
+	// const Timer = () => {
+	// 	const date = new Date();
+	// 	for (const room in socket_room) {
+	// 		const game = GetRoom(room);
+	// 		if (game?.started) {
+	// 			const diff = date.getTime() - game.time_last_moved.getTime();
+	// 			io.in(room).emit('timer', diff);
+	// 		}
+	// 	}
+	// };
+	// setInterval(Timer, 1000);
+
 	console.log('SocketIO injected');
 }
