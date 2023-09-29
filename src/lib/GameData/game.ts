@@ -15,13 +15,14 @@ export class Game {
 	deck: Card[];
 	discard: Card[];
 	players: Player[];
-
+	time_last_moved: Date;
 	constructor(player: Player) {
 		this.started = false;
 		this.deck = [...DeckInstance];
 		this.discard = [];
 		this.current_player = player;
 		this.players = [player];
+		this.time_last_moved = new Date();
 	}
 
 	startGame() {

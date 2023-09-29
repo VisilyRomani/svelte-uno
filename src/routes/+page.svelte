@@ -3,7 +3,6 @@
 	import { goto } from '$app/navigation';
 	import NameModal from '$lib/components/NameModal.svelte';
 	import { Player } from '$lib/store/Player';
-	import { io } from '$lib/socket/socket-client';
 
 	let visible = false;
 	let player: { name: string; player_id: string };
@@ -29,7 +28,7 @@
 
 					return ({ result }) => {
 						if (result.type === 'success') {
-							goto('/uno/' + result.data?.room_code);
+							goto(String(result.data?.room_code));
 						}
 					};
 				}}
@@ -52,7 +51,7 @@
 
 						return ({ result }) => {
 							if (result.type === 'success') {
-								goto('/uno/' + result?.data?.room_code);
+								goto(String(result?.data?.room_code));
 							}
 						};
 					}}

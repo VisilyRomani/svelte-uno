@@ -1,9 +1,7 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import { Player } from '$lib/store/Player';
 	import { onMount } from 'svelte';
 	import GameState from '$lib/components/GameState.svelte';
-	import avatar from 'animal-avatar-generator';
 	import ShortUniqueId from 'short-unique-id';
 	import { io } from '$lib/socket/socket-client.js';
 	import { Game, type GameNotStarted, type GameStarted } from '$lib/api/GameApi.js';
