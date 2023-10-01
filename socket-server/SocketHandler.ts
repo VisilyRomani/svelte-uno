@@ -24,8 +24,8 @@ export default function injectSocketIO(server: http.Server) {
 			console.log('start reload', room);
 		});
 
-		socket.on('timer', ({ room_code, timer }: { room_code: string; timer: number }) => {
-			io.in(room_code).emit('player_countdown', timer);
+		socket.on('timer', ({ room_code, time_last }: { room_code: string; time_last: number }) => {
+			io.in(room_code).emit('player_countdown', time_last);
 		});
 	});
 

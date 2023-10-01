@@ -15,6 +15,7 @@ export const actions = {
 		const room = GetRoom(room_code);
 		if (room) {
 			room.startGame();
+			console.log(room);
 		} else {
 			throw error(400, { message: 'Cant find room' });
 		}

@@ -9,10 +9,7 @@
 	const uid = new ShortUniqueId();
 
 	export let data;
-	let loading = false;
-	let isStarted = false;
 	let room: GameNotStarted | GameStarted | undefined;
-	let is_host: boolean;
 
 	const refetchRoom = async () => {
 		room = await Game.GameData({ player_id: $Player.player_id, room_code: data.slug });
@@ -37,7 +34,7 @@
 
 <svelte:window on:beforeunload={beforeUnload} />
 {#if room?.started}
-	<GameState code={data.slug} />
+	<GameState room_code={data.slug} {refetchRoom} />
 {:else if !!room}
 	<Lobby {room} {refetchRoom} />
 {/if}

@@ -6,14 +6,17 @@
 	import Opponent from './Opponent.svelte';
 	import { io } from '$lib/socket/socket-client';
 
-	const player_timer = 30;
+	export let refetchRoom: () => Promise<void>;
+	export let room_code: string;
+
+	const player_timer = 1;
 	let time_last = 0;
-	export let code: string;
 	let data: GameStarted | undefined;
 	let hand: { card_id: string; value: string; suit: string }[] = [];
+	$: console.log(room_code);
 	onMount(async () => {
 		try {
-			const res = await Game.GameData({ room_code: code, player_id: $Player.player_id });
+			const res = await Game.GameData({ room_code, player_id: $Player.player_id });
 			if (res?.started) {
 				data = res;
 			}
@@ -27,31 +30,33 @@
 		time_last = msg;
 	});
 
-	const Timer = () => {
+	const endTurn = async () => {
+		Game.DrawCard(room_code, true);
+		await refetchRoom();
+		io.emit('update', room_code);
+	};
+
+	const Timer = async () => {
 		if (data?.time_last_moved) {
 			time_last = (new Date().getTime() - new Date(data?.time_last_moved).getTime()) / 1000;
 		}
 		if (data?.current_player.player_id === $Player.player_id) {
 			if (player_timer - time_last < 0) {
-				// auto next turn
+				endTurn();
 			} else {
-				io.emit('timer', { room_code: code, timer: time_last });
-				setTimeout(Timer, 1000);
+				io.emit('timer', { room_code, time_last: time_last });
+				setTimeout(Timer, 500);
 			}
 		}
 	};
-	setTimeout(Timer, 1000);
-	$: console.log(player_timer - time_last);
+	setTimeout(Timer, 500);
 </script>
 
 {#if !data}
 	<div aria-busy="true" />
 {:else}
 	<div class="container">
-		<!-- <p class="timer">{timer}</p> -->
-		<!-- {#if data.current_player.player_id !== $Player.player_id} -->
 		<progress class="timer" value={player_timer - time_last} max="30" />
-		<!-- {/if} -->
 		<div class="opponent-container">
 			{#each data.players ?? [] as player}
 				<Opponent {player} active={player.player_id === data.current_player.player_id} />
@@ -59,7 +64,12 @@
 		</div>
 
 		<div class="center-container">
-			<button class="draw" />
+			<button
+				class="draw"
+				on:click={() => {
+					Game.DrawCard(room_code, false);
+				}}
+			/>
 			<Card isHand={true} card={data.in_play} />
 		</div>
 

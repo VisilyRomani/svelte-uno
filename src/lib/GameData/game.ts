@@ -12,6 +12,7 @@ export class Game {
 	started: boolean;
 	current_player: Player;
 	in_play: Card | undefined;
+	has_drawn_card: boolean;
 	deck: Card[];
 	discard: Card[];
 	players: Player[];
@@ -19,6 +20,7 @@ export class Game {
 	constructor(player: Player) {
 		this.started = false;
 		this.deck = [...DeckInstance];
+		this.has_drawn_card = false;
 		this.discard = [];
 		this.current_player = player;
 		this.players = [player];
@@ -30,7 +32,7 @@ export class Game {
 		this.time_last_moved = new Date();
 		this.players.map((p, idx) => {
 			if (idx + 1 > this.players.length - 1) {
-				p.next_player = undefined;
+				p.next_player = this.players.at(0);
 			} else {
 				p.next_player = this.players[(idx += 1)];
 			}
@@ -120,5 +122,99 @@ export class Game {
 	playerJoin(player: { player_id: string; name: string }) {
 		const newPlayer = new Player(player);
 		this.players.push(newPlayer);
+	}
+
+	playCard({
+		card_id,
+		value,
+		suit,
+		player_id,
+		selected_suit
+	}: {
+		card_id: string;
+		value: string;
+		suit: string;
+		player_id: string | undefined;
+		selected_suit: string | undefined;
+	}) {
+		const index = this.current_player.hand.findIndex((c) => c.card_id === card_id);
+		const discard = this.current_player.hand.splice(index, 1);
+		switch (value) {
+			case '⍉': {
+				if (this.current_player.next_player?.next_player) {
+					this.current_player = this.current_player.next_player?.next_player;
+					this.in_play = discard.at(0);
+					this.time_last_moved = new Date();
+				} else {
+					console.error('SKIP ERROR: no next player ');
+				}
+				break;
+			}
+			case '⧉': {
+				this.current_player.next_player?.addCard(this.drawRandomCard(2));
+				this.setNextPlayer();
+				this.time_last_moved = new Date();
+
+				break;
+			}
+			case '⇅': {
+				const discard = this.current_player.hand.splice(index, 1);
+				this.in_play = discard.at(0);
+				const player = this.players.find((p) => p.player_id === player_id);
+				if (player) {
+					const current_hand = [...this.current_player.hand];
+					this.current_player.setHand(player?.hand.length ? [...player.hand] : []);
+					player.setHand(current_hand);
+					this.setNextPlayer();
+					this.time_last_moved = new Date();
+				} else {
+					console.error('SWAP ERROR: selected player not found');
+				}
+				break;
+			}
+			case 'wild': {
+				const discard = this.current_player.hand.splice(index, 1);
+				this.in_play = {
+					suit: selected_suit || suit,
+					value: discard.at(0)?.value || value,
+					card_id
+				};
+				this.setNextPlayer();
+				this.time_last_moved = new Date();
+				break;
+			}
+			default: {
+				const discard = this.current_player.hand.splice(index, 1);
+				this.in_play = discard.at(0);
+				this.setNextPlayer();
+				this.time_last_moved = new Date();
+			}
+		}
+	}
+
+	drawCard(force_draw: boolean) {
+		const card = this.drawRandomCard(1);
+		this.current_player.addCard(card);
+		this.has_drawn_card = true;
+		// check hand if there is any valid play and if not auto next turn
+
+		const available_card = this.current_player.hand.filter((c) => {
+			if (c.suit === this.in_play?.suit || c.value == this.in_play?.value || c.value === 'wild') {
+				return true;
+			} else {
+				return false;
+			}
+		});
+		if (!available_card.length || force_draw) {
+			this.setNextPlayer();
+		}
+	}
+
+	setNextPlayer() {
+		if (this.current_player.next_player) {
+			this.current_player = this.current_player.next_player;
+		} else {
+			console.error('missing next player');
+		}
 	}
 }

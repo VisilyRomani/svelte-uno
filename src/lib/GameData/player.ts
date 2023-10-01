@@ -18,8 +18,8 @@ export class Player {
 		this.hand = hand;
 	}
 
-	addCard(card: Card) {
-		this.hand.push(card);
+	addCard(card: Card[]) {
+		this.hand.push(...card);
 	}
 
 	removeCard(card: Card) {

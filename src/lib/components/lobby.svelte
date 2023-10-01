@@ -9,7 +9,6 @@
 	export let room: GameNotStarted;
 	export let refetchRoom: () => Promise<void>;
 
-	$: console.log(room);
 	$: is_host =
 		!!room?.players?.find((p) => p.player_id === $Player.player_id && p.is_host) || false;
 	$: room_code = String($page.data.slug);

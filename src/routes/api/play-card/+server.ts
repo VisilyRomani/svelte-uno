@@ -1,3 +1,5 @@
+import SuperJSON from 'superjson';
+
 export type drawType = {
 	room_code: string;
 	card: {
@@ -8,7 +10,7 @@ export type drawType = {
 };
 export async function POST({ request }) {
 	const data = await request.json();
-	const { card, room_code }: drawType = JSON.parse(data.body);
+	// const { card, room_code }: drawType = SuperJSON.parse(data.body);
 
 	return new Response();
 }

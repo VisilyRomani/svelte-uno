@@ -1,7 +1,7 @@
 import type { Card } from '$lib/GameData/game';
 import type { Player } from '$lib/GameData/player';
 import axios from 'axios';
-
+import SuperJSON from 'superjson';
 export interface GameStarted {
 	started: true;
 	in_play: Card;
@@ -41,12 +41,14 @@ export const Game = {
 			console.log(err);
 		}
 	},
-	DrawCard: async (room_code: string) => {
+	DrawCard: async (room_code: string, turn_end: boolean) => {
+		console.log(room_code);
 		try {
-			const response = await axios.get('/api/draw-card', {
-				data: {
-					room_code
-				}
+			const response = await axios.post('/api/draw-card', {
+				body: SuperJSON.stringify({
+					room_code,
+					turn_end
+				})
 			});
 			return response;
 		} catch (err) {
@@ -63,7 +65,7 @@ export const Game = {
 		console.log(room_code, card);
 		try {
 			const response = await axios.post('/api/play-card', {
-				body: JSON.stringify({
+				body: SuperJSON.stringify({
 					room_code,
 					card
 				})
