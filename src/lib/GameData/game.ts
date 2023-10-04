@@ -32,9 +32,9 @@ export class Game {
 		this.time_last_moved = new Date();
 		this.players.map((p, idx) => {
 			if (idx + 1 > this.players.length - 1) {
-				p.next_player = this.players.at(0);
+				p.setNextPlayer(this.players.at(0));
 			} else {
-				p.next_player = this.players[(idx += 1)];
+				p.setNextPlayer(this.players[(idx += 1)]);
 			}
 
 			p.setHand(this.drawRandomCard(7));
@@ -101,14 +101,14 @@ export class Game {
 	playerDisconnect(player_id: string) {
 		const player = this.players.find((p) => p.player_id === player_id);
 		this.players = this.players.filter((p) => p.player_id !== player_id);
-		const prevPlayer = this.players.find((p) => p.next_player?.player_id === player?.player_id);
+		const prevPlayer = this.players.find((p) => p.getNextPlayer()?.player_id === player?.player_id);
 
 		if (!player) {
 			throw error(404, { message: 'cant find disconnecting player' });
 		}
 
 		if (prevPlayer) {
-			prevPlayer.next_player = player.next_player;
+			prevPlayer.getNextPlayer()?.setNextPlayer(player.getNextPlayer());
 		}
 		if (player.is_host && this.players.length) {
 			this.players[0].is_host = true;
@@ -141,8 +141,9 @@ export class Game {
 		const discard = this.current_player.hand.splice(index, 1);
 		switch (value) {
 			case '⍉': {
-				if (this.current_player.next_player?.next_player) {
-					this.current_player = this.current_player.next_player?.next_player;
+				const skipPlayer = this.current_player.getNextPlayer()?.getNextPlayer();
+				if (skipPlayer) {
+					this.current_player = skipPlayer;
 					this.in_play = discard.at(0);
 					this.time_last_moved = new Date();
 				} else {
@@ -151,10 +152,9 @@ export class Game {
 				break;
 			}
 			case '⧉': {
-				this.current_player.next_player?.addCard(this.drawRandomCard(2));
+				this.current_player.getNextPlayer()?.addCard(this.drawRandomCard(2));
 				this.setNextPlayer();
 				this.time_last_moved = new Date();
-
 				break;
 			}
 			case '⇅': {
@@ -196,7 +196,6 @@ export class Game {
 		const card = this.drawRandomCard(1);
 		this.current_player.addCard(card);
 		this.has_drawn_card = true;
-		// check hand if there is any valid play and if not auto next turn
 
 		const available_card = this.current_player.hand.filter((c) => {
 			if (c.suit === this.in_play?.suit || c.value == this.in_play?.value || c.value === 'wild') {
@@ -211,10 +210,15 @@ export class Game {
 	}
 
 	setNextPlayer() {
-		if (this.current_player.next_player) {
-			this.current_player = this.current_player.next_player;
+		console.log('current', this.current_player.name);
+		const nextPlayer = this.current_player.getNextPlayer();
+		if (nextPlayer) {
+			this.current_player = nextPlayer;
 		} else {
 			console.error('missing next player');
 		}
+		this.time_last_moved = new Date();
+		console.log('next', this.current_player.name);
+		console.log('Date', this.time_last_moved);
 	}
 }

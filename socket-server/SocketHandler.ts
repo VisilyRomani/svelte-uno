@@ -7,6 +7,7 @@ export default function injectSocketIO(server: http.Server) {
 	const socket_room: string[] = [];
 	io.sockets.on('connection', (socket) => {
 		socket.on('subscribe', function (room: string) {
+			console.log('connected');
 			socket.join(room);
 			socket_room.push(room);
 			io.in(room).emit('reload', `is reloading for: ${room}, subscribe`);

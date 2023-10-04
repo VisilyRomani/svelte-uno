@@ -2,55 +2,57 @@
 	import { Player } from '$lib/store/Player';
 	import Card from './Card.svelte';
 	import { Game, type GameStarted } from '$lib/api/GameApi';
-	import { onMount } from 'svelte';
 	import Opponent from './Opponent.svelte';
 	import { io } from '$lib/socket/socket-client';
 
 	export let refetchRoom: () => Promise<void>;
 	export let room_code: string;
 
-	const player_timer = 1;
+	const player_timer = 5;
 	let time_last = 0;
-	let data: GameStarted | undefined;
-	let hand: { card_id: string; value: string; suit: string }[] = [];
-	$: console.log(room_code);
-	onMount(async () => {
-		try {
-			const res = await Game.GameData({ room_code, player_id: $Player.player_id });
-			if (res?.started) {
-				data = res;
-			}
-			hand = data?.hand ?? [];
-		} catch (error) {
-			console.log('error');
-		}
-	});
+	export let data: GameStarted;
+	$: hand = data.hand;
+	let interval_id: NodeJS.Timeout;
 
-	$: io.on('player_countdown', (msg: number) => {
+	io.on('player_countdown', (msg: number) => {
 		time_last = msg;
 	});
 
 	const endTurn = async () => {
-		Game.DrawCard(room_code, true);
+		await Game.DrawCard(room_code, true);
 		await refetchRoom();
 		io.emit('update', room_code);
 	};
 
-	const Timer = async () => {
-		if (data?.time_last_moved) {
-			time_last = (new Date().getTime() - new Date(data?.time_last_moved).getTime()) / 1000;
-		}
-		if (data?.current_player.player_id === $Player.player_id) {
-			if (player_timer - time_last < 0) {
-				endTurn();
-			} else {
-				io.emit('timer', { room_code, time_last: time_last });
-				setTimeout(Timer, 500);
-			}
-		}
-	};
-	setTimeout(Timer, 500);
+	// Move timer into server component
+	// const Timer = async () => {
+	// 	if (data?.time_last_moved) {
+	// 		time_last = (new Date().getTime() - new Date(data?.time_last_moved).getTime()) / 1000;
+	// 	} else {
+	// 		clearInterval(interval_id);
+	// 	}
+	// 	if (data?.current_player.player_id === $Player.player_id) {
+	// 		if (player_timer - time_last < 0) {
+	// 			await endTurn();
+	// 		} else {
+	// 			io.emit('timer', { room_code, time_last: time_last });
+	// 		}
+	// 	} else {
+	// 		clearInterval(interval_id);
+	// 	}
+	// };
+	// $: if (data?.current_player.player_id === $Player.player_id) {
+	// 	interval_id = setInterval(Timer, 500);
+	// }
+	// $: console.log(player_timer - time_last);
 </script>
+
+<!-- 
+	Move timer to Socket Handler file
+	Start timer from Start button 
+
+
+ -->
 
 {#if !data}
 	<div aria-busy="true" />

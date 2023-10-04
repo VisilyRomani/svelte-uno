@@ -4,7 +4,7 @@ export class Player {
 	player_id: string;
 	name: string;
 	is_host: boolean;
-	next_player: Player | undefined;
+	#next_player: Player | undefined;
 	hand: Card[];
 
 	constructor({ player_id, name }: { player_id: string; name: string }, is_host = false) {
@@ -26,5 +26,12 @@ export class Player {
 		const discard = this.hand.find((c) => c.card_id === card.card_id);
 		this.hand = this.hand.filter((c) => c.card_id !== card.card_id);
 		return discard;
+	}
+	setNextPlayer(player: Player | undefined) {
+		this.#next_player = player;
+	}
+
+	getNextPlayer() {
+		return this.#next_player;
 	}
 }

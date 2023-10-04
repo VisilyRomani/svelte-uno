@@ -9,6 +9,7 @@
 	const uid = new ShortUniqueId();
 
 	export let data;
+
 	let room: GameNotStarted | GameStarted | undefined;
 
 	const refetchRoom = async () => {
@@ -19,11 +20,12 @@
 		refetchRoom();
 	});
 
-	io.emit('subscribe', data.slug);
+	$: data && io.emit('subscribe', data.slug);
 
-	const beforeUnload = async () => {
+	const beforeUnload = () => {
 		console.log('unloaded');
 		io.emit('unsubscribe', data.slug);
+		io.disconnect();
 	};
 
 	io.on('reload', (msg: string) => {
@@ -34,7 +36,9 @@
 
 <svelte:window on:beforeunload={beforeUnload} />
 {#if room?.started}
-	<GameState room_code={data.slug} {refetchRoom} />
+	{#key data.url}
+		<GameState room_code={data.slug} data={room} {refetchRoom} />
+	{/key}
 {:else if !!room}
 	<Lobby {room} {refetchRoom} />
 {/if}

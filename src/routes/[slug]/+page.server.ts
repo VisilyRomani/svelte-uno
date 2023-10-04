@@ -2,9 +2,11 @@ import { GetRoom } from '$lib/GameData/GameController.js';
 import { error } from '@sveltejs/kit';
 
 export const ssr = false;
-export const load = async ({ params }) => {
+
+export const load = async ({ params, url }) => {
 	return {
-		slug: params.slug
+		slug: params.slug,
+		url: url.href
 	};
 };
 

@@ -1,7 +1,7 @@
 import type { Card } from '$lib/GameData/game';
 import type { Player } from '$lib/GameData/player';
 import axios from 'axios';
-import SuperJSON from 'superjson';
+
 export interface GameStarted {
 	started: true;
 	in_play: Card;
@@ -29,10 +29,13 @@ export type GameData = GameNotStarted | GameStarted;
 export const Game = {
 	GameData: async ({ player_id, room_code }: { player_id: string; room_code: string }) => {
 		try {
-			const { data } = await axios.get<GameNotStarted | GameStarted>('/api/game-data', {
+			const { data } = await axios.get('/api/game-data', {
 				params: {
 					player_id,
 					room_code
+				},
+				headers: {
+					'Content-Type': 'text/plain'
 				}
 			});
 
@@ -44,13 +47,13 @@ export const Game = {
 	DrawCard: async (room_code: string, turn_end: boolean) => {
 		console.log(room_code);
 		try {
-			const response = await axios.post('/api/draw-card', {
-				body: SuperJSON.stringify({
+			const { data } = await axios.post('/api/draw-card', {
+				body: JSON.stringify({
 					room_code,
 					turn_end
 				})
 			});
-			return response;
+			return data;
 		} catch (err) {
 			console.log(err);
 		}
@@ -65,7 +68,7 @@ export const Game = {
 		console.log(room_code, card);
 		try {
 			const response = await axios.post('/api/play-card', {
-				body: SuperJSON.stringify({
+				body: JSON.stringify({
 					room_code,
 					card
 				})
@@ -76,6 +79,3 @@ export const Game = {
 		}
 	}
 };
-// ⧉
-// 		"value": "⇅"
-// 		"value": "⍉"
