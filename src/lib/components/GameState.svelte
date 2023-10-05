@@ -4,13 +4,14 @@
 	import { Game, type GameStarted } from '$lib/api/GameApi';
 	import Opponent from './Opponent.svelte';
 	import { io } from '$lib/socket/socket-client';
+	import { onDestroy, onMount } from 'svelte';
 
 	export let refetchRoom: () => Promise<void>;
 	export let room_code: string;
+	export let data: GameStarted;
 
 	const player_timer = 5;
 	let time_last = 0;
-	export let data: GameStarted;
 	$: hand = data.hand;
 	let interval_id: NodeJS.Timeout;
 
@@ -19,40 +20,46 @@
 	});
 
 	const endTurn = async () => {
+		time_last = 0;
 		await Game.DrawCard(room_code, true);
 		await refetchRoom();
 		io.emit('update', room_code);
 	};
 
-	// Move timer into server component
+	// onMount(() => {});
+	// onDestroy(() => {
+	// 	clearTimeout(interval_id);
+	// });
+
+	// // Move timer into server component
 	// const Timer = async () => {
-	// 	if (data?.time_last_moved) {
-	// 		time_last = (new Date().getTime() - new Date(data?.time_last_moved).getTime()) / 1000;
-	// 	} else {
-	// 		clearInterval(interval_id);
-	// 	}
-	// 	if (data?.current_player.player_id === $Player.player_id) {
+	// 	time_last = (new Date().getTime() - new Date(data.time_last_moved).getTime()) / 1000;
+
+	// 	if (data.current_player.player_id === $Player.player_id) {
 	// 		if (player_timer - time_last < 0) {
 	// 			await endTurn();
 	// 		} else {
 	// 			io.emit('timer', { room_code, time_last: time_last });
+	// 			setTimeout(Timer, 500);
 	// 		}
 	// 	} else {
-	// 		clearInterval(interval_id);
+	// 		clearTimeout(interval_id);
 	// 	}
 	// };
-	// $: if (data?.current_player.player_id === $Player.player_id) {
-	// 	interval_id = setInterval(Timer, 500);
-	// }
+	// $: interval_id = setTimeout(Timer, 500);
+
 	// $: console.log(player_timer - time_last);
+
+	io.on('success', (msg) => {
+		console.log(msg);
+	});
 </script>
 
-<!-- 
-	Move timer to Socket Handler file
-	Start timer from Start button 
-
-
- -->
+<button
+	on:click={() => {
+		io.emit('test', room_code);
+	}}>test</button
+>
 
 {#if !data}
 	<div aria-busy="true" />

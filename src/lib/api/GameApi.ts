@@ -45,7 +45,6 @@ export const Game = {
 		}
 	},
 	DrawCard: async (room_code: string, turn_end: boolean) => {
-		console.log(room_code);
 		try {
 			const { data } = await axios.post('/api/draw-card', {
 				body: JSON.stringify({
@@ -65,7 +64,6 @@ export const Game = {
 		room_code: string;
 		card: { card_id: string; value: string; suit: string };
 	}) => {
-		console.log(room_code, card);
 		try {
 			const response = await axios.post('/api/play-card', {
 				body: JSON.stringify({

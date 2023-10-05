@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Player } from '$lib/store/Player';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import GameState from '$lib/components/GameState.svelte';
 	import ShortUniqueId from 'short-unique-id';
 	import { io } from '$lib/socket/socket-client.js';
@@ -22,19 +22,16 @@
 
 	$: data && io.emit('subscribe', data.slug);
 
-	const beforeUnload = () => {
-		console.log('unloaded');
-		io.emit('unsubscribe', data.slug);
-		io.disconnect();
-	};
-
 	io.on('reload', (msg: string) => {
 		console.log(msg);
 		refetchRoom();
 	});
+
+	onDestroy(() => {
+		io.emit('unsubscribe', data.slug);
+	});
 </script>
 
-<svelte:window on:beforeunload={beforeUnload} />
 {#if room?.started}
 	{#key data.url}
 		<GameState room_code={data.slug} data={room} {refetchRoom} />

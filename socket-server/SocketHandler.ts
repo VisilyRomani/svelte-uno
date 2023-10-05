@@ -1,6 +1,7 @@
 // socketIoHandler.js
 import { Server } from 'socket.io';
 import type http from 'http';
+const { SWUNO_ROOM } = await import('../src/lib/GameData/GameController');
 
 export default function injectSocketIO(server: http.Server) {
 	const io = new Server(server);
@@ -22,11 +23,16 @@ export default function injectSocketIO(server: http.Server) {
 
 		socket.on('update', (room: string) => {
 			io.in(room).emit('reload', `is reloading for: ${room}, update`);
-			console.log('start reload', room);
 		});
 
 		socket.on('timer', ({ room_code, time_last }: { room_code: string; time_last: number }) => {
 			io.in(room_code).emit('player_countdown', time_last);
+		});
+
+		socket.on('test', (msg) => {
+			console.log('room_code', msg);
+			console.log(SWUNO_ROOM);
+			io.emit('success');
 		});
 	});
 
