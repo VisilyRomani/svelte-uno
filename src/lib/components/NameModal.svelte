@@ -16,11 +16,16 @@
 </script>
 
 <dialog open={visible}>
-	<form on:submit={UpdateName}>
-		<label for="name">
-			Name
-			<input id="name" name="name" />
-		</label>
-		<button>submit</button>
-	</form>
+	<article>
+		<form on:submit={UpdateName}>
+			<label for="name">
+				Name
+				<input id="name" name="name" />
+			</label>
+			<footer>
+				<button type="button" on:click={() => (visible = false)}>close</button>
+				<button>submit</button>
+			</footer>
+		</form>
+	</article>
 </dialog>

@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { Game } from '$lib/api/GameApi';
 
-	export let deck: false;
+	export let isHand = false;
 	export let card: { value: string; suit: string; card_id: string };
 	const Color = () => {
 		if (card.suit === 'R') {
@@ -11,17 +11,21 @@
 			return 'background-color: rgb(114, 255, 156)';
 		} else if (card.suit === 'B') {
 			return 'background-color: rgb(114, 137, 255)';
+		} else if (card.value === 'wild') {
+			return 'background-color: black';
 		} else {
 			return 'background-color: rgb(243, 255, 114)';
 		}
 	};
 
 	const PlayCard = async () => {
-		// await Game.PlayCard({ room_code: $page.data.slug, card });
+		if (!isHand) {
+			await Game.PlayCard({ room_code: $page.data.slug, card });
+		}
 	};
 </script>
 
-<button on:click={() => PlayCard()} class="card" style={Color()}>
+<button on:click={() => PlayCard()} class={`${isHand ? 'disable' : ''} card`} style={Color()}>
 	<h1>{card.value}</h1>
 </button>
 
@@ -31,23 +35,24 @@
 		padding: 0;
 		width: 100px;
 		min-width: 100px;
-		height: 150px;
+		height: 70%;
+		max-height: 150px;
 		border-radius: 10px;
-		margin-left: -30px;
-		transition: 0.3s ease;
 		z-index: 1;
 		border: 5px solid rgb(129, 129, 129);
 		user-select: none;
+
+		transition: 0.3s ease;
+		&:not(.disable):hover,
+		&:not(.disable):active {
+			transform: translateY(-30px);
+			z-index: 99;
+		}
 	}
 	button {
 		all: unset;
 	}
 
-	.card:hover,
-	.card:active {
-		transform: translateY(-30px);
-		z-index: 99;
-	}
 	h1 {
 		margin: 0;
 		padding: 0;

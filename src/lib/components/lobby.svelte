@@ -7,10 +7,15 @@
 	import { Player } from '$lib/store/Player';
 	let loading: boolean;
 	export let room: GameNotStarted;
-	export let refetchRoom: () => Promise<void>;
+	// export let refetchRoom: () => Promise<void>;
 
-	$: is_host = !!room?.players.find((p) => p.player_id === $Player.player_id && p.is_host) || false;
-	$: room_code = String($page.data.slug);
+	$: is_host =
+		!!room?.players?.find((p) => p.player_id === $Player.player_id && p.is_host) || false;
+	$: room_code = String($page.params.slug);
+
+	const StartGame = async () => {
+		io.emit('START-GAME', room_code);
+	};
 </script>
 
 <div class="container">
@@ -28,23 +33,7 @@
 			<h3>code: {room_code}</h3>
 		</div>
 		{#if is_host}
-			<form
-				method="post"
-				action="?/start"
-				use:enhance={async (event) => {
-					loading = true;
-					event.formData.append('room_code', room_code);
-					return async ({ result }) => {
-						if (result.type === 'success') {
-							await refetchRoom();
-							io.emit('update', room_code);
-							loading = false;
-						}
-					};
-				}}
-			>
-				<button aria-busy={loading} disabled={loading}>Start</button>
-			</form>
+			<button on:click={StartGame} disabled={loading}>Start</button>
 		{/if}
 	</article>
 </div>
