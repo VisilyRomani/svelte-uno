@@ -33,7 +33,7 @@
 	});
 
 	onDestroy(() => {
-		io.emit('unsubscribe', room_code);
+		io.emit('unsubscribe', room_code, $Player.player_id);
 	});
 </script>
 

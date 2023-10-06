@@ -102,15 +102,20 @@ export class Game {
 		const player = this.players.find((p) => p.player_id === player_id);
 		this.players = this.players.filter((p) => p.player_id !== player_id);
 		const prevPlayer = this.players.find((p) => p.getNextPlayer()?.player_id === player?.player_id);
-
 		if (!player) {
-			throw error(404, { message: 'cant find disconnecting player' });
+			return;
 		}
 
-		if (prevPlayer) {
-			prevPlayer.getNextPlayer()?.setNextPlayer(player.getNextPlayer());
+		if (this.current_player.player_id === player_id) {
+			const nextPlayer = player.getNextPlayer();
+			if (nextPlayer) {
+				this.current_player = nextPlayer;
+			}
 		}
-		if (player.is_host && this.players.length) {
+		if (prevPlayer) {
+			prevPlayer.setNextPlayer(player.getNextPlayer());
+		}
+		if (player?.is_host && this.players.length) {
 			this.players[0].is_host = true;
 		}
 	}
@@ -210,7 +215,6 @@ export class Game {
 	}
 
 	setNextPlayer() {
-		console.log('current', this.current_player.name);
 		const nextPlayer = this.current_player.getNextPlayer();
 		if (nextPlayer) {
 			this.current_player = nextPlayer;
@@ -218,7 +222,5 @@ export class Game {
 			console.error('missing next player');
 		}
 		this.time_last_moved = new Date();
-		console.log('next', this.current_player.name);
-		console.log('Date', this.time_last_moved);
 	}
 }

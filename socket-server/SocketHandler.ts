@@ -1,9 +1,8 @@
 import { Server } from 'socket.io';
 import type http from 'http';
-const controller = await import('./GameData/GameController');
+const { Controller } = await import('./GameData/GameController');
 
 type NewRoomType = {
-	room_code: string;
 	player: {
 		name: string;
 		player_id: string;
@@ -12,33 +11,45 @@ type NewRoomType = {
 
 export default function injectSocketIO(server: http.Server) {
 	const io = new Server(server);
-
+	const PlayerSocket: { player_id: string; socket_id: string; room_code: string }[] = [];
 	io.sockets.on('connection', (socket) => {
-		socket.on('NEW-ROOM', (msg: NewRoomType, callback) => {
-			const room_code = controller.CreateRoom(msg.player);
+		socket.on('NEW-ROOM', ({ player }: NewRoomType, callback) => {
+			const room_code = Controller.CreateRoom(player);
+			PlayerSocket.push({
+				player_id: player.player_id,
+				socket_id: socket.id,
+				room_code: room_code
+			});
 			callback({ room_code });
 		});
 
 		socket.on(
 			'JOIN-ROOM',
-			(msg: { room_code: string; player: { name: string; player_id: string } }, callback) => {
-				console.log(msg);
-				const room = controller.GetRoom(msg.room_code);
+			(
+				{ room_code, player }: { room_code: string; player: { name: string; player_id: string } },
+				callback
+			) => {
+				const room = Controller.GetRoom(room_code);
 				if (room) {
-					room.playerJoin(msg.player);
-					callback({ room_code: msg.room_code });
-					io.in(msg.room_code).emit('FORCE-DATA-UPDATE');
+					room.playerJoin(player);
+					io.in(room_code).emit('FORCE-DATA-UPDATE');
+					callback({ room_code: room_code });
+					PlayerSocket.push({
+						player_id: player.player_id,
+						socket_id: socket.id,
+						room_code: room_code
+					});
 				}
 			}
 		);
 
 		socket.on('GET-ROOM-DATA', (msg: { room_code: string; player_id: string }, callback) => {
-			const room = controller.GetRoom(msg.room_code)?.gameState(msg.player_id);
+			const room = Controller.GetRoom(msg.room_code)?.gameState(msg.player_id);
 			callback({ room });
 		});
 
 		socket.on('START-GAME', (room_code: string) => {
-			const room = controller.GetRoom(room_code);
+			const room = Controller.GetRoom(room_code);
 			if (room) {
 				room.startGame();
 				io.in(room_code).emit('FORCE-DATA-UPDATE');
@@ -50,38 +61,46 @@ export default function injectSocketIO(server: http.Server) {
 			io.in(room).emit('reload', `is reloading for: ${room}, subscribe`);
 		});
 
-		socket.on('unsubscribe', function (room: string) {
-			console.log('disconnected');
-
-			socket.leave(room);
-			io.in(room).emit('reload', `is reloading for: ${room}, unsubscribe`);
+		socket.on('unsubscribe', function (room_code: string, player_id: string) {
+			const room = Controller.GetRoom(room_code);
+			room?.playerDisconnect(player_id);
+			if (!room?.playerCount()) {
+				Controller.DeleteRoom(room_code);
+				socket.leave(room_code);
+			}
+			io.in(room_code).emit('FORCE-DATA-UPDATE');
 		});
 
 		socket.on('UPDATE', (room: string) => {
 			io.in(room).emit('FORCE-DATA-UPDATE');
 		});
 
-		// socket.on('timer', ({ room_code, time_last }: { room_code: string; time_last: number }) => {
-		// 	io.in(room_code).emit('player_countdown', time_last);
-		// });
+		socket.on('disconnect', () => {
+			const player = PlayerSocket.find((ps) => ps.socket_id === ps.socket_id);
+			if (player) {
+				Controller.ForceDisconnectPlayer(player.player_id);
+				io.in(player.room_code).emit('FORCE-DATA-UPDATE');
+			}
+		});
 	});
 
 	const StartLoop = () => {
+		const player_timer = 5;
 		const date = new Date();
-		controller.SWUNO_ROOM.forEach((game, room) => {
+		Controller.GetAllRooms().forEach((game, room) => {
 			if (game.started) {
-				io.in(room).emit('TIMER', date.getTime() - game.time_last_moved.getTime());
+				const time_difference = (date.getTime() - game.time_last_moved.getTime()) / 1000;
+				console.log(time_difference);
+				if (player_timer - time_difference < 0) {
+					game.drawCard(true);
+					io.in(room).emit('FORCE-DATA-UPDATE');
+				} else {
+					io.in(room).emit('TIMER', player_timer - time_difference);
+				}
 			}
 		});
-		// for (const room in controller.SWUNO_ROOM) {
-		// 	const game = GetRoom(room);
-		// 	if (game?.started) {
-		// 		const diff = date.getTime() - game.time_last_moved.getTime();
-		// 		io.in(room).emit('timer', diff);
-		// 	}
-		// }
 	};
-	// setInterval(Timer, 1000);
+	setInterval(StartLoop, 500);
 
 	console.log('SocketIO injected');
 }

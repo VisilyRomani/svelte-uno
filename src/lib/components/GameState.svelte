@@ -10,62 +10,26 @@
 	export let room_code: string;
 	export let data: GameStarted;
 
-	const player_timer = 5;
-	let time_last = 0;
+	let time = 0;
 	$: hand = data.hand;
-	let interval_id: NodeJS.Timeout;
 
-	io.on('player_countdown', (msg: number) => {
-		time_last = msg;
+	io.on('TIMER', (msg: number) => {
+		time = msg;
 	});
 
-	const endTurn = async () => {
-		time_last = 0;
-		await Game.DrawCard(room_code, true);
-		await refetchRoom();
-		io.emit('update', room_code);
-	};
-
-	// onMount(() => {});
-	// onDestroy(() => {
-	// 	clearTimeout(interval_id);
-	// });
-
-	// // Move timer into server component
-	// const Timer = async () => {
-	// 	time_last = (new Date().getTime() - new Date(data.time_last_moved).getTime()) / 1000;
-
-	// 	if (data.current_player.player_id === $Player.player_id) {
-	// 		if (player_timer - time_last < 0) {
-	// 			await endTurn();
-	// 		} else {
-	// 			io.emit('timer', { room_code, time_last: time_last });
-	// 			setTimeout(Timer, 500);
-	// 		}
-	// 	} else {
-	// 		clearTimeout(interval_id);
-	// 	}
+	// const endTurn = async () => {
+	// 	time_last = 0;
+	// 	await Game.DrawCard(room_code, true);
+	// 	await refetchRoom();
+	// 	io.emit('update', room_code);
 	// };
-	// $: interval_id = setTimeout(Timer, 500);
-
-	// $: console.log(player_timer - time_last);
-
-	io.on('success', (msg) => {
-		console.log(msg);
-	});
 </script>
-
-<button
-	on:click={() => {
-		io.emit('test', room_code);
-	}}>test</button
->
 
 {#if !data}
 	<div aria-busy="true" />
 {:else}
 	<div class="container">
-		<progress class="timer" value={player_timer - time_last} max="30" />
+		<progress class="timer" value={time} max="5" />
 		<div class="opponent-container">
 			{#each data.players ?? [] as player}
 				<Opponent {player} active={player.player_id === data.current_player.player_id} />
