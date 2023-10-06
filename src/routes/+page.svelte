@@ -1,15 +1,33 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import NameModal from '$lib/components/NameModal.svelte';
+	import { io } from '$lib/socket/socket-client';
 	import { Player } from '$lib/store/Player';
 
 	let visible = false;
 	let player: { name: string; player_id: string };
 
+	let roomCodeInput = '';
+
 	Player.subscribe((current) => {
 		player = current;
 	});
+
+	const JoinRoom = () => {
+		io.emit(
+			'JOIN-ROOM',
+			{ room_code: roomCodeInput, player: $Player },
+			(response: { room_code: string }) => {
+				goto(response.room_code);
+			}
+		);
+	};
+
+	const HostRoom = () => {
+		io.emit('NEW-ROOM', { player: $Player }, (response: { room_code: string }) => {
+			goto(response.room_code);
+		});
+	};
 </script>
 
 <main class="container">
@@ -19,45 +37,19 @@
 			<h2>Player: {$Player.name}</h2>
 		</hgroup>
 		<div class="grid-main">
-			<form
-				method="post"
-				action="?/connect"
-				use:enhance={(event) => {
-					event.formData.append('name', $Player.name);
-					event.formData.append('player_id', $Player.player_id);
-
-					return ({ result }) => {
-						if (result.type === 'success') {
-							goto(String(result.data?.room_code));
-						}
-					};
-				}}
-			>
+			<div>
 				<label for="room_code">
 					Join Room
-					<input id="room_code" name="room_code" />
+					<input bind:value={roomCodeInput} />
 				</label>
+				<button class="outline" on:click={JoinRoom} disabled={!$Player.name}>enter</button>
+			</div>
 
-				<button class="outline" disabled={!$Player.name}>enter</button>
-			</form>
 			<div class="divider" />
 			<div class="right">
-				<form
-					method="POST"
-					action="?/host"
-					use:enhance={(event) => {
-						event.formData.append('name', $Player.name);
-						event.formData.append('player_id', $Player.player_id);
-
-						return ({ result }) => {
-							if (result.type === 'success') {
-								goto(String(result?.data?.room_code));
-							}
-						};
-					}}
-				>
-					<button class="outline" disabled={!$Player.name}>Host</button>
-				</form>
+				<div>
+					<button class="outline" on:click={HostRoom} disabled={!$Player.name}>Host</button>
+				</div>
 			</div>
 		</div>
 		<div class="setting">

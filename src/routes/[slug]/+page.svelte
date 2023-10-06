@@ -2,40 +2,43 @@
 	import { Player } from '$lib/store/Player';
 	import { onDestroy, onMount } from 'svelte';
 	import GameState from '$lib/components/GameState.svelte';
-	import ShortUniqueId from 'short-unique-id';
 	import { io } from '$lib/socket/socket-client.js';
-	import { Game, type GameNotStarted, type GameStarted } from '$lib/api/GameApi.js';
 	import Lobby from '$lib/components/lobby.svelte';
-	const uid = new ShortUniqueId();
+	import { page } from '$app/stores';
+	import type { GameNotStarted, GameStarted } from '$lib/api/GameApi';
 
-	export let data;
-
+	const room_code = $page.params.slug;
 	let room: GameNotStarted | GameStarted | undefined;
 
+	io.emit('subscribe', room_code);
+
 	const refetchRoom = async () => {
-		room = await Game.GameData({ player_id: $Player.player_id, room_code: data.slug });
+		io.emit(
+			'GET-ROOM-DATA',
+			{ room_code, player_id: $Player.player_id },
+			(response: { room: GameNotStarted | GameStarted }) => {
+				room = response.room;
+				console.log(response.room);
+			}
+		);
 	};
 
 	onMount(async () => {
 		refetchRoom();
 	});
 
-	$: data && io.emit('subscribe', data.slug);
-
-	io.on('reload', (msg: string) => {
-		console.log(msg);
+	io.on('FORCE-DATA-UPDATE', () => {
+		console.log('force update');
 		refetchRoom();
 	});
 
 	onDestroy(() => {
-		io.emit('unsubscribe', data.slug);
+		io.emit('unsubscribe', room_code);
 	});
 </script>
 
 {#if room?.started}
-	{#key data.url}
-		<GameState room_code={data.slug} data={room} {refetchRoom} />
-	{/key}
+	<GameState {room_code} data={room} {refetchRoom} />
 {:else if !!room}
-	<Lobby {room} {refetchRoom} />
+	<Lobby {room} />
 {/if}
