@@ -40,7 +40,7 @@
 			<div>
 				<label for="room_code">
 					Join Room
-					<input bind:value={roomCodeInput} />
+					<input name="room_code" bind:value={roomCodeInput} />
 				</label>
 				<button class="outline" on:click={JoinRoom} disabled={!$Player.name}>enter</button>
 			</div>

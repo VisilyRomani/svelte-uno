@@ -1,19 +1,19 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import type { GameNotStarted } from '$lib/api/GameApi';
 	import { io } from '$lib/socket/socket-client';
 	import avatar from 'animal-avatar-generator';
 	import { page } from '$app/stores';
 	import { Player } from '$lib/store/Player';
+	import type { GameNotStarted } from '$lib/types/GameTypes';
 	let loading: boolean;
+
 	export let room: GameNotStarted;
-	// export let refetchRoom: () => Promise<void>;
 
 	$: is_host =
 		!!room?.players?.find((p) => p.player_id === $Player.player_id && p.is_host) || false;
 	$: room_code = String($page.params.slug);
 
 	const StartGame = async () => {
+		loading = true;
 		io.emit('START-GAME', room_code);
 	};
 </script>

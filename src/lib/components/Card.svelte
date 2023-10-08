@@ -1,9 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { Game } from '$lib/api/GameApi';
+	import { io } from '$lib/socket/socket-client';
+	import { Player } from '$lib/store/Player';
 
 	export let isHand = false;
 	export let card: { value: string; suit: string; card_id: string };
+	export const disabled: boolean = false;
+	const room_code = $page.params.slug;
+
 	const Color = () => {
 		if (card.suit === 'R') {
 			return 'background-color: rgb(255, 114, 114)';
@@ -19,29 +23,30 @@
 	};
 
 	const PlayCard = async () => {
-		if (!isHand) {
-			await Game.PlayCard({ room_code: $page.data.slug, card });
+		if (isHand && !disabled) {
+			io.emit('PLAY-CARD', { ...card, room_code, player: $Player, selected_suit: '' });
+			// await Game.PlayCard({ room_code: $page.data.slug, card });
 		}
 	};
 </script>
 
-<button on:click={() => PlayCard()} class={`${isHand ? 'disable' : ''} card`} style={Color()}>
+<button on:click={() => PlayCard()} class={`${!isHand ? 'disable' : 'hand'} card`} style={Color()}>
 	<h1>{card.value}</h1>
 </button>
 
 <style>
 	.card {
+		all: unset;
 		margin: 0;
 		padding: 0;
-		width: 100px;
-		min-width: 100px;
-		height: 70%;
-		max-height: 150px;
+		--width: 5em;
+		--height: calc(var(--width) * 1.4);
+		min-width: var(--width);
+		height: var(--height);
 		border-radius: 10px;
 		z-index: 1;
 		border: 5px solid rgb(129, 129, 129);
 		user-select: none;
-
 		transition: 0.3s ease;
 		&:not(.disable):hover,
 		&:not(.disable):active {
@@ -49,15 +54,13 @@
 			z-index: 99;
 		}
 	}
-	button {
-		all: unset;
-	}
 
 	h1 {
 		margin: 0;
 		padding: 0;
-		font-size: 45px;
+		font-size: 2em;
+		text-wrap: nowrap;
 		text-align: center;
-		-webkit-text-stroke: 2px rgb(65, 65, 65);
+		-webkit-text-stroke: 1px rgb(65, 65, 65);
 	}
 </style>

@@ -56,6 +56,24 @@ export default function injectSocketIO(server: http.Server) {
 			}
 		});
 
+		socket.on(
+			'PLAY-CARD',
+			(
+				card: { card_id: string; suit: string; value: string },
+				room_code: string,
+				player: { player_id: string }
+			) => {
+				const room = Controller.GetRoom(room_code);
+				if (room) {
+					room.playCard({ ...card, player_id: player.player_id, selected_suit: '' });
+				}
+			}
+		);
+
+		socket.on('UPDATE', (room: string) => {
+			io.in(room).emit('FORCE-DATA-UPDATE');
+		});
+
 		socket.on('subscribe', function (room: string) {
 			socket.join(room);
 			io.in(room).emit('reload', `is reloading for: ${room}, subscribe`);
@@ -70,11 +88,6 @@ export default function injectSocketIO(server: http.Server) {
 			}
 			io.in(room_code).emit('FORCE-DATA-UPDATE');
 		});
-
-		socket.on('UPDATE', (room: string) => {
-			io.in(room).emit('FORCE-DATA-UPDATE');
-		});
-
 		socket.on('disconnect', () => {
 			const player = PlayerSocket.find((ps) => ps.socket_id === ps.socket_id);
 			if (player) {
@@ -85,7 +98,7 @@ export default function injectSocketIO(server: http.Server) {
 	});
 
 	const StartLoop = () => {
-		const player_timer = 5;
+		const player_timer = 30;
 		const date = new Date();
 		Controller.GetAllRooms().forEach((game, room) => {
 			if (game.started) {

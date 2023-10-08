@@ -5,7 +5,7 @@
 	import { io } from '$lib/socket/socket-client.js';
 	import Lobby from '$lib/components/lobby.svelte';
 	import { page } from '$app/stores';
-	import type { GameNotStarted, GameStarted } from '$lib/api/GameApi';
+	import type { GameNotStarted, GameStarted } from '$lib/types/GameTypes';
 
 	const room_code = $page.params.slug;
 	let room: GameNotStarted | GameStarted | undefined;
@@ -18,7 +18,6 @@
 			{ room_code, player_id: $Player.player_id },
 			(response: { room: GameNotStarted | GameStarted }) => {
 				room = response.room;
-				console.log(response.room);
 			}
 		);
 	};
@@ -38,7 +37,7 @@
 </script>
 
 {#if room?.started}
-	<GameState {room_code} data={room} {refetchRoom} />
+	<GameState data={room} />
 {:else if !!room}
 	<Lobby {room} />
 {/if}
